@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: blog-service
+  task:
+    execution:
+      pool:
+        max-size: 160
+  r2dbc:
+    url: r2dbc:jdbc:h2:mem:testdb
+    username: sa
+    password:
+    pool:
+      max-size: 150
+
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
