@@ -9,7 +9,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ArticleTest {
 
     @Test
-    void constructor() {
+    void constructorTest() {
         Article expected = new Article();
 
         assertThat(new Article())
@@ -17,7 +17,7 @@ public class ArticleTest {
     }
 
     @Test
-    void constructor2() {
+    void constructor2Test() {
         Article expected = new Article(1L, CATEGORY_ID, WRITER_ID, TITLE, CONTENT, CREATED_AT, UPDATED_AT);
 
         assertThat(article())
@@ -25,7 +25,7 @@ public class ArticleTest {
     }
 
     @Test
-    void updateTitle() {
+    void updateTitleTest() {
         Article expected = titleUpdatedArticle();
 
         assertThat(article().updateTitle("new title string"))
@@ -33,7 +33,7 @@ public class ArticleTest {
     }
 
     @Test
-    void updateContent() {
+    void updateContentTest() {
         Article expected = contentUpdatedArticle();
 
         assertThat(article().updateContent("new content string"))
