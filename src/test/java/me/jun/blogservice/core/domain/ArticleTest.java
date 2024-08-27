@@ -18,7 +18,15 @@ public class ArticleTest {
 
     @Test
     void constructor2Test() {
-        Article expected = new Article(1L, CATEGORY_ID, WRITER_ID, TITLE, CONTENT, CREATED_AT, UPDATED_AT);
+        Article expected = Article.builder()
+                .id(ARTICLE_ID)
+                .categoryId(CATEGORY_ID)
+                .writerId(WRITER_ID)
+                .title(TITLE)
+                .content(CONTENT)
+                .createdAt(CREATED_AT)
+                .updatedAt(UPDATED_AT)
+                .build();
 
         assertThat(article())
                 .isEqualToComparingFieldByField(expected);

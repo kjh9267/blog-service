@@ -28,7 +28,15 @@ abstract public class ArticleFixture {
     public static final String NEW_CONTENT = "new content string";
 
     public static Article article() {
-        return new Article(ARTICLE_ID, CATEGORY_ID, WRITER_ID, TITLE, CONTENT, CREATED_AT, UPDATED_AT);
+        return Article.builder()
+                .id(ARTICLE_ID)
+                .categoryId(CATEGORY_ID)
+                .writerId(WRITER_ID)
+                .title(TITLE)
+                .content(CONTENT)
+                .createdAt(CREATED_AT)
+                .updatedAt(UPDATED_AT)
+                .build();
     }
 
     public static Article titleUpdatedArticle() {
