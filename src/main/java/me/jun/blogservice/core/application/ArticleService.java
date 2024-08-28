@@ -1,13 +1,14 @@
 package me.jun.blogservice.core.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.dto.*;
-import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
-import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -16,33 +17,32 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
 
 
-    public ArticleResponse createArticle(CreateArticleRequest request) {
-        Article article = request.toEntity();
-
-        Article savedArticle = articleRepository.save(article);
-
-        return ArticleResponse.of(savedArticle);
+    public Mono<ArticleResponse> createArticle(Mono<CreateArticleRequest> requestMono) {
+        return requestMono.map(CreateArticleRequest::toEntity)
+                .map(articleRepository::save)
+                .map(ArticleResponse::of);
     }
 
-    public ArticleResponse retrieveArticle(RetrieveArticleRequest request) {
-        Long requestId = request.getId();
-
-        Article article = articleRepository.findById(requestId)
-                .orElseThrow(() -> new ArticleNotFoundException(requestId));
-
-        return ArticleResponse.of(article);
+    public Mono<ArticleResponse> retrieveArticle(Mono<RetrieveArticleRequest> requestMono) {
+        return requestMono.map(
+                request -> articleRepository.findById(request.getId())
+                        .map(ArticleResponse::of)
+                        .orElse(ArticleResponse.builder().build())
+                );
     }
 
-    public ArticleResponse updateArticle(UpdateArticleRequest request) {
-        Article updatedArticle = articleRepository.findById(request.getId())
-                .map(article -> article.updateTitle(request.getTitle()))
-                .map(article -> article.updateContent(request.getContent()))
-                .orElseThrow(() -> new ArticleNotFoundException(request.getId()));
-
-        return ArticleResponse.of(updatedArticle);
+    public Mono<ArticleResponse> updateArticle(Mono<UpdateArticleRequest> requestMono) {
+        return requestMono.map(
+                request -> articleRepository.findById(request.getId())
+                        .map(article -> article.updateTitle(request.getTitle()))
+                        .map(article -> article.updateContent(request.getContent()))
+                        .map(ArticleResponse::of)
+                        .orElse(ArticleResponse.builder().build())
+        );
     }
 
-    public void deleteArticle(DeleteArticleRequest request) {
-        articleRepository.deleteById(request.getId());
+    public Mono<Void> deleteArticle(Mono<DeleteArticleRequest> requestMono) {
+        return requestMono.doOnNext(request -> articleRepository.deleteById(request.getId()))
+                .flatMap(request -> Mono.empty());
     }
 }

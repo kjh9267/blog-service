@@ -13,4 +13,10 @@ public class RetrieveArticleRequest {
     @NotNull
     @Positive
     private Long id;
+
+    public static RetrieveArticleRequest of(Long requestId) {
+        return RetrieveArticleRequest.builder()
+                .id(requestId)
+                .build();
+    }
 }

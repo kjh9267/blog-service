@@ -9,6 +9,7 @@ import me.jun.blogservice.core.domain.ArticleInfo;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 @Builder
 @Getter
 public class CreateArticleRequest {
