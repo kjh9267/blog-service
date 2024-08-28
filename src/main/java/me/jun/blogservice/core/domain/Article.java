@@ -15,6 +15,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Builder(toBuilder = true)
 @EntityListeners(AuditingEntityListener.class)
 @EqualsAndHashCode(of = "id")
+@ToString
 @Getter
 @Entity
 public class Article {
