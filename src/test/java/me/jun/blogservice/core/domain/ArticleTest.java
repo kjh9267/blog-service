@@ -1,12 +1,31 @@
 package me.jun.blogservice.core.domain;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("deprecation")
 public class ArticleTest {
+
+    private Article article;
+
+    @Mock
+    private ArticleInfo articleInfo;
+
+    @BeforeEach
+    void setUp() {
+        article = article().toBuilder()
+                .articleInfo(articleInfo)
+                .build();
+    }
 
     @Test
     void constructorTest() {
@@ -22,8 +41,7 @@ public class ArticleTest {
                 .id(ARTICLE_ID)
                 .categoryId(CATEGORY_ID)
                 .writerId(WRITER_ID)
-                .title(TITLE)
-                .content(CONTENT)
+                .articleInfo(articleInfo())
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
                 .build();
@@ -34,17 +52,29 @@ public class ArticleTest {
 
     @Test
     void updateTitleTest() {
-        Article expected = titleUpdatedArticle();
+        ArticleInfo expected = updatedArticleInfo();
 
-        assertThat(article().updateTitle("new title string"))
+        given(articleInfo.updateTitle(any()))
+                .willReturn(updatedArticleInfo());
+
+        ArticleInfo updatedArticleInfo = article.updateTitle("new title string")
+                .getArticleInfo();
+
+        assertThat(updatedArticleInfo)
                 .isEqualToComparingFieldByField(expected);
     }
 
     @Test
     void updateContentTest() {
-        Article expected = contentUpdatedArticle();
+        ArticleInfo expected = updatedArticleInfo();
 
-        assertThat(article().updateContent("new content string"))
+        given(articleInfo.updateContent(any()))
+                .willReturn(updatedArticleInfo());
+
+        ArticleInfo updatedArticleInfo = article.updateContent("new content string")
+                .getArticleInfo();
+
+        assertThat(updatedArticleInfo)
                 .isEqualToComparingFieldByField(expected);
     }
 }

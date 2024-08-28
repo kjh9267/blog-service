@@ -30,11 +30,8 @@ public class Article {
     @Column(nullable = false)
     private Long writerId;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String content;
+    @Embedded
+    private ArticleInfo articleInfo;
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
@@ -45,12 +42,12 @@ public class Article {
     private Instant updatedAt;
 
     public Article updateTitle(String newTitle) {
-        this.title = newTitle;
+        this.articleInfo = articleInfo.updateTitle(newTitle);
         return this;
     }
 
     public Article updateContent(String newContent) {
-        this.content = newContent;
+        this.articleInfo = articleInfo.updateContent(newContent);
         return this;
     }
 }
