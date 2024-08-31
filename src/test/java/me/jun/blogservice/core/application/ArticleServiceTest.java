@@ -1,6 +1,7 @@
 package me.jun.blogservice.core.application;
 
 import me.jun.blogservice.core.application.dto.ArticleResponse;
+import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import me.jun.blogservice.core.domain.repository.ArticleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -59,8 +61,10 @@ public class ArticleServiceTest {
         given(articleRepository.findById(any()))
                 .willReturn(Optional.empty());
 
-        assertThat(articleService.retrieveArticle(Mono.just(retrieveArticleRequest())).block())
-                .isEqualTo(emptyArticleResponse());
+        assertThrows(
+                ArticleNotFoundException.class,
+                () -> articleService.retrieveArticle(Mono.just(retrieveArticleRequest())).block()
+        );
     }
 
     @Test
@@ -79,8 +83,10 @@ public class ArticleServiceTest {
         given(articleRepository.findById(any()))
                 .willReturn(Optional.empty());
 
-        assertThat(articleService.updateArticle(Mono.just(updateArticleRequest())).block())
-                .isEqualTo(emptyArticleResponse());
+        assertThrows(
+                ArticleNotFoundException.class,
+                () -> articleService.updateArticle(Mono.just(updateArticleRequest())).block()
+        );
     }
 
     @Test

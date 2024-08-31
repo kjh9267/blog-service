@@ -124,9 +124,4 @@ abstract public class ArticleFixture {
                 .id(ARTICLE_ID)
                 .build();
     }
-
-    public static ArticleResponse emptyArticleResponse() {
-        return ArticleResponse.builder()
-                .build();
-    }
 }
