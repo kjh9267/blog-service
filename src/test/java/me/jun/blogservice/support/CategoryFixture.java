@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import me.jun.blogservice.core.application.dto.CategoryResponse;
 import me.jun.blogservice.core.application.dto.CreateCategoryRequest;
+import me.jun.blogservice.core.application.dto.RetrieveCategoryRequest;
 import me.jun.blogservice.core.domain.Category;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,6 +45,12 @@ abstract public class CategoryFixture {
                 .id(CATEGORY_ID)
                 .name(CATEGORY_NAME)
                 .mappedArticleCount(INITIAL_MAPPED_ARTICLE_COUNT)
+                .build();
+    }
+
+    public static RetrieveCategoryRequest retrieveCategoryRequest() {
+        return RetrieveCategoryRequest.builder()
+                .id(CATEGORY_ID)
                 .build();
     }
 }
