@@ -64,4 +64,26 @@ class CategoryServiceTest {
                 () -> categoryService.retrieveCategory(Mono.just(retrieveCategoryRequest())).block()
         );
     }
+
+    @Test
+    void updateCategoryTest() {
+        CategoryResponse expected = categoryResponse();
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(initialCategory()));
+
+        assertThat(categoryService.updateCategory(Mono.just(updateCategoryRequest())).block())
+                .isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    void noCategory_updateCategoryFailTest() {
+        given(categoryRepository.findById(any()))
+                .willThrow(CategoryNotFoundException.of(String.valueOf(CATEGORY_ID)));
+
+        assertThrows(
+                CategoryNotFoundException.class,
+                () -> categoryService.updateCategory(Mono.just(updateCategoryRequest())).block()
+        );
+    }
 }

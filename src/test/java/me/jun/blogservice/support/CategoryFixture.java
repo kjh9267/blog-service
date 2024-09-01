@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import me.jun.blogservice.core.application.dto.CategoryResponse;
 import me.jun.blogservice.core.application.dto.CreateCategoryRequest;
 import me.jun.blogservice.core.application.dto.RetrieveCategoryRequest;
+import me.jun.blogservice.core.application.dto.UpdateCategoryRequest;
 import me.jun.blogservice.core.domain.Category;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -13,6 +14,8 @@ abstract public class CategoryFixture {
     public static final Long CATEGORY_ID = 1L;
 
     public static final String CATEGORY_NAME = "category name string";
+
+    public static final String NEW_CATEGORY_NAME = "new category name string";
 
     public static final Long INITIAL_MAPPED_ARTICLE_COUNT = 0L;
 
@@ -51,6 +54,13 @@ abstract public class CategoryFixture {
     public static RetrieveCategoryRequest retrieveCategoryRequest() {
         return RetrieveCategoryRequest.builder()
                 .id(CATEGORY_ID)
+                .build();
+    }
+
+    public static UpdateCategoryRequest updateCategoryRequest() {
+        return UpdateCategoryRequest.builder()
+                .id(category().getId())
+                .name(NEW_CATEGORY_NAME)
                 .build();
     }
 }
