@@ -6,7 +6,7 @@ import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Builder(toBuilder = true)
 @Getter
 public class UpdateArticleRequest {
 
@@ -18,4 +18,6 @@ public class UpdateArticleRequest {
 
     @NotBlank
     private String content;
+
+    private Long writerId;
 }

@@ -8,6 +8,7 @@ import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.dto.ArticleResponse;
 import me.jun.blogservice.core.application.dto.CreateArticleRequest;
 import me.jun.blogservice.core.application.dto.RetrieveArticleRequest;
+import me.jun.blogservice.core.application.dto.UpdateArticleRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -56,6 +57,25 @@ public class ArticleController {
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
                 )
+                .doOnError(throwable -> log.info("{}", throwable));
+    }
+
+    @PutMapping(
+            produces = APPLICATION_JSON_VALUE,
+            consumes = APPLICATION_JSON_VALUE
+    )
+    public Mono<ResponseEntity<ArticleResponse>> updateArticle(@RequestBody @Valid UpdateArticleRequest request, @WriterId Long writerId) {
+        return articleService.updateArticle(
+                Mono.fromSupplier(
+                        () -> request.toBuilder()
+                                .writerId(writerId)
+                                .build()
+                        )
+                        .log()
+        )
+                .log()
+                .map(articleResponse -> ResponseEntity.ok()
+                        .body(articleResponse))
                 .doOnError(throwable -> log.info("{}", throwable));
     }
 }

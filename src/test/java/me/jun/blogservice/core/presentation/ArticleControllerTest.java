@@ -199,4 +199,93 @@ public class ArticleControllerTest {
                 .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
+
+    @Test
+    void updateArticleTest() throws JsonProcessingException {
+        String content = objectMapper.writeValueAsString(updateArticleRequest());
+
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willReturn(Mono.just(WRITER_ID));
+
+        given(articleService.updateArticle(any()))
+                .willReturn(Mono.just(articleResponse()));
+
+        webTestClient.put()
+                .uri("/api/articles")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, TOKEN)
+                .bodyValue(content)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("id").exists()
+                .jsonPath("title").exists()
+                .jsonPath("content").exists()
+                .jsonPath("createdAt").exists()
+                .jsonPath("updatedAt").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void noToken_updateArticleFailTest() throws JsonProcessingException {
+        String content = objectMapper.writeValueAsString(updateArticleRequest());
+
+        webTestClient.put()
+                .uri("/api/articles")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(content)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void invalidToken_updateArticleFailTest() throws JsonProcessingException {
+        String content = objectMapper.writeValueAsString(updateArticleRequest());
+
+        given(jwtProvider.extractSubject(any()))
+                .willThrow(InvalidTokenException.of(TOKEN));
+
+        webTestClient.put()
+                .uri("/api/articles")
+                .header(AUTHORIZATION, TOKEN)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(content)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void unknownWriter_updateArticleFailTest() throws JsonProcessingException {
+        String content = objectMapper.writeValueAsString(updateArticleRequest());
+
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willThrow(WebClientResponseException.class);
+
+        webTestClient.put()
+                .uri("/api/articles")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .header(AUTHORIZATION, TOKEN)
+                .bodyValue(content)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
 }
