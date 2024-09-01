@@ -7,11 +7,9 @@ import me.jun.blogservice.common.security.WriterId;
 import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.dto.ArticleResponse;
 import me.jun.blogservice.core.application.dto.CreateArticleRequest;
+import me.jun.blogservice.core.application.dto.RetrieveArticleRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -36,6 +34,23 @@ public class ArticleController {
                                 .build()
                 )
                         .log()
+        )
+                .log()
+                .map(articleResponse -> ResponseEntity.ok()
+                        .body(articleResponse)
+                )
+                .doOnError(throwable -> log.info("{}", throwable));
+    }
+
+    @GetMapping(
+            value = "/{articleId}",
+            produces = APPLICATION_JSON_VALUE
+    )
+    public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
+        return articleService.retrieveArticle(
+                Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
+                        .log()
+                        .doOnError(throwable -> log.info("{}", throwable))
         )
                 .log()
                 .map(articleResponse -> ResponseEntity.ok()

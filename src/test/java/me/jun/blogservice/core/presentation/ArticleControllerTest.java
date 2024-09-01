@@ -6,6 +6,7 @@ import me.jun.blogservice.common.security.JwtProvider;
 import me.jun.blogservice.common.security.exception.InvalidTokenException;
 import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.WriterService;
+import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
+import static me.jun.blogservice.support.TokenFixture.EMAIL;
 import static me.jun.blogservice.support.TokenFixture.TOKEN;
 import static me.jun.blogservice.support.WriterFixture.WRITER_EMAIL;
 import static org.mockito.ArgumentMatchers.any;
@@ -141,6 +143,58 @@ public class ArticleControllerTest {
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void retrieveArticleTest() {
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willReturn(Mono.just(WRITER_ID));
+
+        given(articleService.retrieveArticle(any()))
+                .willReturn(Mono.just(articleResponse()));
+
+        webTestClient.get()
+                .uri("/api/articles/1")
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("id").exists()
+                .jsonPath("title").exists()
+                .jsonPath("content").exists()
+                .jsonPath("createdAt").exists()
+                .jsonPath("updatedAt").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void wrongPathVariable_retrieveArticleFailTest() {
+        webTestClient.get()
+                .uri("/api/articles/adsf")
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void noContent_retrieveArticleFailTest() {
+        given(articleService.retrieveArticle(any()))
+                .willThrow(ArticleNotFoundException.of(String.valueOf(ARTICLE_ID)));
+
+        webTestClient.get()
+                .uri("/api/articles/1")
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError()
                 .expectBody()
                 .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
