@@ -1,8 +1,17 @@
 package me.jun.blogservice.common.security.exception;
 
-public class InvalidTokenException extends RuntimeException {
+import me.jun.blogservice.support.BusinessException;
 
-    public InvalidTokenException(String token) {
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+public class InvalidTokenException extends BusinessException {
+
+    private InvalidTokenException(String token) {
         super(token);
+        status = UNAUTHORIZED;
+    }
+
+    public static InvalidTokenException of(String message) {
+        return new InvalidTokenException(message);
     }
 }
