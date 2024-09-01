@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.common.security.WriterId;
 import me.jun.blogservice.core.application.ArticleService;
-import me.jun.blogservice.core.application.dto.ArticleResponse;
-import me.jun.blogservice.core.application.dto.CreateArticleRequest;
-import me.jun.blogservice.core.application.dto.RetrieveArticleRequest;
-import me.jun.blogservice.core.application.dto.UpdateArticleRequest;
+import me.jun.blogservice.core.application.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -76,6 +73,18 @@ public class ArticleController {
                 .log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse))
+                .doOnError(throwable -> log.info("{}", throwable));
+    }
+
+    @DeleteMapping(value = "/{articleId}")
+    public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
+        return articleService.deleteArticle(
+                Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
+                        .log()
+        )
+                .log()
+                .map(empty -> ResponseEntity.ok()
+                        .body(empty))
                 .doOnError(throwable -> log.info("{}", throwable));
     }
 }

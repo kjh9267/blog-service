@@ -288,4 +288,100 @@ public class ArticleControllerTest {
                 .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
+
+    @Test
+    void deleteArticleTest() {
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willReturn(Mono.just(WRITER_ID));
+
+        given(articleService.deleteArticle(any()))
+                .willReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/api/articles/1")
+                .header(AUTHORIZATION, TOKEN)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void wrongPathVariable_deleteArticleFailTest() {
+        webTestClient.delete()
+                .uri("/api/delete/asdf")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void noArticle_deleteArticleFailTest() {
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willReturn(Mono.just(WRITER_ID));
+
+        given(articleService.deleteArticle(any()))
+                .willThrow(ArticleNotFoundException.of("1"));
+
+        webTestClient.delete()
+                .uri("/api/articles/1")
+                .header(AUTHORIZATION, TOKEN)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void noToken_deleteArticleFailTest() {
+        webTestClient.delete()
+                .uri("/api/articles/1")
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void invalidToken_deleteArticleFailTest() {
+        given(jwtProvider.extractSubject(any()))
+                .willThrow(InvalidTokenException.of(TOKEN));
+
+        webTestClient.delete()
+                .uri("/api/articles/1")
+                .header(AUTHORIZATION, TOKEN)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void unknownWriter_deleteArticleFailTest() {
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willThrow(WebClientResponseException.class);
+
+        webTestClient.delete()
+                .uri("/api/articles/1")
+                .header(AUTHORIZATION, TOKEN)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
 }
