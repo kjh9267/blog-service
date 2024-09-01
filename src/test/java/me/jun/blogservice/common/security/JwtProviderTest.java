@@ -29,7 +29,7 @@ class JwtProviderTest {
     void validateTokenTest() {
         assertThrows(
                 InvalidTokenException.class,
-                () -> jwtProvider.validateToken("wrong token")
+                () -> jwtProvider.extractSubject("wrong token")
         );
     }
 }

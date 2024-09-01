@@ -31,4 +31,11 @@ public class Category {
         this.mappedArticleCount -= 1;
         return this;
     }
+
+    public static Category of(String name) {
+        return Category.builder()
+                .name(name)
+                .mappedArticleCount(0L)
+                .build();
+    }
 }

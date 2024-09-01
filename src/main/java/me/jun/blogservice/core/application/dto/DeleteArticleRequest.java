@@ -11,4 +11,10 @@ public class DeleteArticleRequest {
 
     @NotNull
     private Long id;
+
+    public static DeleteArticleRequest of(Long id) {
+        return DeleteArticleRequest.builder()
+                .id(id)
+                .build();
+    }
 }

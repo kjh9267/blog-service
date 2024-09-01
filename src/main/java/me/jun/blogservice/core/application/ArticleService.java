@@ -31,7 +31,7 @@ public class ArticleService {
                 .map(
                         request -> articleRepository.findById(request.getId())
                                 .map(ArticleResponse::of)
-                                .orElseThrow(() -> new ArticleNotFoundException(String.valueOf(request.getId())))
+                                .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
                 )
                 .doOnError(throwable -> log.info("{}", throwable));
     }
@@ -43,7 +43,7 @@ public class ArticleService {
                                 .map(article -> article.updateTitle(request.getTitle()))
                                 .map(article -> article.updateContent(request.getContent()))
                                 .map(ArticleResponse::of)
-                                .orElseThrow(() -> new ArticleNotFoundException(String.valueOf(request.getId())))
+                                .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
         )
                 .doOnError(throwable -> log.info("{}", throwable));
     }
