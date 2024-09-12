@@ -19,9 +19,10 @@ public class Writer {
     )
     private Long value;
 
-    public void validate(Long value) {
-        if (this.value != value) {
+    public Writer validate(Long value) {
+        if (!this.value.equals(value)) {
             throw WriterMismatchException.of(value.toString());
         }
+        return this;
     }
 }

@@ -12,6 +12,6 @@ public class WriterMismatchException extends BusinessException {
     }
 
     public static WriterMismatchException of(String message) {
-        return WriterMismatchException.of(message);
+        return new WriterMismatchException(message);
     }
 }

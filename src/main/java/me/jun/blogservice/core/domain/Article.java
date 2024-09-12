@@ -50,4 +50,9 @@ public class Article {
         this.articleInfo = articleInfo.updateContent(newContent);
         return this;
     }
+
+    public Article validateWriter(Long writerId) {
+        writer.validate(writerId);
+        return this;
+    }
 }
