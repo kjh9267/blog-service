@@ -7,6 +7,7 @@ import me.jun.blogservice.common.security.exception.InvalidTokenException;
 import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.WriterService;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
+import me.jun.blogservice.core.domain.exception.WriterMismatchException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -258,6 +259,32 @@ public class ArticleControllerTest {
                 .header(AUTHORIZATION, TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
+                .bodyValue(content)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("detail").exists()
+                .consumeWith(System.out::println);
+    }
+
+    @Test
+    void invalidWriter_updateArticleFailTest() throws JsonProcessingException {
+        String content = objectMapper.writeValueAsString(updateArticleRequest());
+
+        given(jwtProvider.extractSubject(any()))
+                .willReturn(EMAIL);
+
+        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
+                .willReturn(Mono.just(2L));
+
+        given(articleService.updateArticle(any()))
+                .willThrow(WriterMismatchException.of("2"));
+
+        webTestClient.put()
+                .uri("/api/articles")
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .header(AUTHORIZATION, TOKEN)
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is4xxClientError()
