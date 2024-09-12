@@ -5,8 +5,13 @@ import lombok.NoArgsConstructor;
 import me.jun.blogservice.core.application.dto.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static me.jun.blogservice.support.WriterFixture.writer;
 
@@ -126,5 +131,23 @@ abstract public class ArticleFixture {
         return DeleteArticleRequest.builder()
                 .id(ARTICLE_ID)
                 .build();
+    }
+
+    public static List<Article> articleList() {
+        return LongStream.rangeClosed(1, 10)
+                .mapToObj(id -> article()
+                        .toBuilder()
+                        .id(id)
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    public static Page<Article> pagedArticles() {
+        return new PageImpl<>(articleList());
+    }
+
+    public static PagedArticleResponse pagedArticleResponse() {
+        return PagedArticleResponse.of(pagedArticles());
     }
 }
