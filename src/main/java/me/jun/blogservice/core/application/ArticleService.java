@@ -40,6 +40,7 @@ public class ArticleService {
         return requestMono.log()
                 .map(
                         request -> articleRepository.findById(request.getId())
+                                .map(article -> article.validateWriter(request.getWriterId()))
                                 .map(article -> article.updateTitle(request.getTitle()))
                                 .map(article -> article.updateContent(request.getContent()))
                                 .map(ArticleResponse::of)

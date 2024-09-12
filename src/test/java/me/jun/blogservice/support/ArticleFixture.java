@@ -111,6 +111,7 @@ abstract public class ArticleFixture {
                 .id(ARTICLE_ID)
                 .title(NEW_TITLE)
                 .content(NEW_CONTENT)
+                .writerId(WRITER_ID)
                 .build();
     }
 
