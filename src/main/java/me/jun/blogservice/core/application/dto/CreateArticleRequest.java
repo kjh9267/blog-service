@@ -1,11 +1,10 @@
 package me.jun.blogservice.core.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;
+import me.jun.blogservice.core.domain.Writer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,8 +19,6 @@ public class CreateArticleRequest {
     @NotBlank
     private String content;
 
-    @NotNull
-    @Positive
     private Long writerId;
 
     public Article toEntity() {
@@ -30,9 +27,13 @@ public class CreateArticleRequest {
                 .content(content)
                 .build();
 
+        Writer writer = Writer.builder()
+                .value(writerId)
+                .build();
+
         return Article.builder()
                 .articleInfo(articleInfo)
-                .writerId(writerId)
+                .writer(writer)
                 .build();
     }
 }

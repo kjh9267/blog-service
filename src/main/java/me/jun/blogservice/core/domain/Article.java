@@ -27,8 +27,8 @@ public class Article {
     @Column(nullable = false)
     private Long categoryId;
 
-    @Column(nullable = false)
-    private Long writerId;
+    @Embedded
+    private Writer writer;
 
     @Embedded
     private ArticleInfo articleInfo;

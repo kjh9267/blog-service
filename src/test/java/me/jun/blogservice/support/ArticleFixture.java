@@ -8,6 +8,8 @@ import me.jun.blogservice.core.domain.ArticleInfo;
 
 import java.time.Instant;
 
+import static me.jun.blogservice.support.WriterFixture.writer;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 abstract public class ArticleFixture {
 
@@ -33,7 +35,7 @@ abstract public class ArticleFixture {
         return Article.builder()
                 .id(ARTICLE_ID)
                 .categoryId(CATEGORY_ID)
-                .writerId(WRITER_ID)
+                .writer(writer())
                 .articleInfo(articleInfo())
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
