@@ -5,8 +5,15 @@ import lombok.NoArgsConstructor;
 import me.jun.blogservice.core.application.dto.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
+import static me.jun.blogservice.support.WriterFixture.writer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 abstract public class ArticleFixture {
@@ -33,7 +40,7 @@ abstract public class ArticleFixture {
         return Article.builder()
                 .id(ARTICLE_ID)
                 .categoryId(CATEGORY_ID)
-                .writerId(WRITER_ID)
+                .writer(writer())
                 .articleInfo(articleInfo())
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
@@ -109,6 +116,7 @@ abstract public class ArticleFixture {
                 .id(ARTICLE_ID)
                 .title(NEW_TITLE)
                 .content(NEW_CONTENT)
+                .writerId(WRITER_ID)
                 .build();
     }
 
@@ -123,5 +131,23 @@ abstract public class ArticleFixture {
         return DeleteArticleRequest.builder()
                 .id(ARTICLE_ID)
                 .build();
+    }
+
+    public static List<Article> articleList() {
+        return LongStream.rangeClosed(1, 10)
+                .mapToObj(id -> article()
+                        .toBuilder()
+                        .id(id)
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    public static Page<Article> pagedArticles() {
+        return new PageImpl<>(articleList());
+    }
+
+    public static PagedArticleResponse pagedArticleResponse() {
+        return PagedArticleResponse.of(pagedArticles());
     }
 }

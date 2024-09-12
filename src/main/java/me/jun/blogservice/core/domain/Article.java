@@ -27,8 +27,8 @@ public class Article {
     @Column(nullable = false)
     private Long categoryId;
 
-    @Column(nullable = false)
-    private Long writerId;
+    @Embedded
+    private Writer writer;
 
     @Embedded
     private ArticleInfo articleInfo;
@@ -48,6 +48,11 @@ public class Article {
 
     public Article updateContent(String newContent) {
         this.articleInfo = articleInfo.updateContent(newContent);
+        return this;
+    }
+
+    public Article validateWriter(Long writerId) {
+        writer.validate(writerId);
         return this;
     }
 }

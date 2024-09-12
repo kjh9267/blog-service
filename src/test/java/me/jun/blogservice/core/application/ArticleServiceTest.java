@@ -1,13 +1,19 @@
 package me.jun.blogservice.core.application;
 
 import me.jun.blogservice.core.application.dto.ArticleResponse;
+import me.jun.blogservice.core.application.dto.PagedArticleResponse;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
+import me.jun.blogservice.core.domain.Article;
+import me.jun.blogservice.core.domain.Writer;
+import me.jun.blogservice.core.domain.exception.WriterMismatchException;
 import me.jun.blogservice.core.domain.repository.ArticleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -79,12 +85,27 @@ public class ArticleServiceTest {
     }
 
     @Test
-    void updateArticleFailTest() {
+    void noArticle_updateArticleFailTest() {
         given(articleRepository.findById(any()))
                 .willReturn(Optional.empty());
 
         assertThrows(
                 ArticleNotFoundException.class,
+                () -> articleService.updateArticle(Mono.just(updateArticleRequest())).block()
+        );
+    }
+
+    @Test
+    void invalidWriter_updateArticleFailTest() {
+        Article article = article().toBuilder()
+                .writer(Writer.builder().value(2L).build())
+                .build();
+
+        given(articleRepository.findById(any()))
+                .willReturn(Optional.of(article));
+
+        assertThrows(
+                WriterMismatchException.class,
                 () -> articleService.updateArticle(Mono.just(updateArticleRequest())).block()
         );
     }
@@ -100,5 +121,16 @@ public class ArticleServiceTest {
 
         verify(articleRepository)
                 .deleteById(deleteArticleRequest().getId());
+    }
+
+    @Test
+    void retrievePagedArticleTest() {
+        PagedArticleResponse expected = pagedArticleResponse();
+
+        given(articleRepository.findAll((Pageable) any()))
+                .willReturn(pagedArticles());
+
+        assertThat(articleService.retrievePagedArticle(Mono.just(PageRequest.of(0, 10))).block())
+                .isEqualToComparingFieldByField(expected);
     }
 }

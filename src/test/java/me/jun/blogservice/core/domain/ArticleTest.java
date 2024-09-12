@@ -1,5 +1,6 @@
 package me.jun.blogservice.core.domain;
 
+import me.jun.blogservice.core.domain.exception.WriterMismatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,9 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
+import static me.jun.blogservice.support.WriterFixture.writer;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("deprecation")
@@ -18,12 +22,16 @@ public class ArticleTest {
     private Article article;
 
     @Mock
-    private ArticleInfo articleInfo;
+    private ArticleInfo mockArticleInfo;
+
+    @Mock
+    private Writer mockWriter;
 
     @BeforeEach
     void setUp() {
         article = article().toBuilder()
-                .articleInfo(articleInfo)
+                .articleInfo(mockArticleInfo)
+                .writer(mockWriter)
                 .build();
     }
 
@@ -40,7 +48,7 @@ public class ArticleTest {
         Article expected = Article.builder()
                 .id(ARTICLE_ID)
                 .categoryId(CATEGORY_ID)
-                .writerId(WRITER_ID)
+                .writer(writer())
                 .articleInfo(articleInfo())
                 .createdAt(CREATED_AT)
                 .updatedAt(UPDATED_AT)
@@ -54,7 +62,7 @@ public class ArticleTest {
     void updateTitleTest() {
         ArticleInfo expected = updatedArticleInfo();
 
-        given(articleInfo.updateTitle(any()))
+        given(mockArticleInfo.updateTitle(any()))
                 .willReturn(updatedArticleInfo());
 
         ArticleInfo updatedArticleInfo = article.updateTitle("new title string")
@@ -68,7 +76,7 @@ public class ArticleTest {
     void updateContentTest() {
         ArticleInfo expected = updatedArticleInfo();
 
-        given(articleInfo.updateContent(any()))
+        given(mockArticleInfo.updateContent(any()))
                 .willReturn(updatedArticleInfo());
 
         ArticleInfo updatedArticleInfo = article.updateContent("new content string")
@@ -76,5 +84,30 @@ public class ArticleTest {
 
         assertThat(updatedArticleInfo)
                 .isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    void validateWriterTest() {
+        given(mockWriter.validate(any()))
+                .willReturn(mockWriter);
+
+        assertAll(
+                () -> assertDoesNotThrow(
+                        () -> article.validateWriter(WRITER_ID)
+                ),
+                () -> verify(mockWriter)
+                        .validate(WRITER_ID)
+        );
+    }
+
+    @Test
+    void validateWriterFailTest() {
+        given(mockWriter.validate(any()))
+                .willThrow(WriterMismatchException.of("2"));
+
+        assertThrows(
+                WriterMismatchException.class,
+                () -> article.validateWriter(2L)
+        );
     }
 }
