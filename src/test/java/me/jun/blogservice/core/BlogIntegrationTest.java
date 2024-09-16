@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import static io.restassured.RestAssured.given;
 import static me.jun.blogservice.support.ArticleFixture.createArticleRequest;
+import static me.jun.blogservice.support.ArticleFixture.updateArticleRequest;
 import static me.jun.blogservice.support.WriterFixture.*;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -54,9 +55,13 @@ public class BlogIntegrationTest {
     }
 
     @Test
-    void blogTest() {
+    void
+
+
+    blogTest() {
         createArticle();
         retrieveArticle(1L);
+        updateArticle();
     }
 
     private void createArticle() {
@@ -94,6 +99,14 @@ public class BlogIntegrationTest {
     }
 
     private void retrieveArticle(Long id) {
+        MockResponse mockResponse = new MockResponse()
+                .setResponseCode(OK.value())
+                .setHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setBody(WRITER_RESPONSE_JSON);
+
+        mockWebServer.url(WRITER_BASE_URL + ":" + mockWebServer.getPort() + WRITER_URI + "/" + WRITER_EMAIL);
+        mockWebServer.enqueue(mockResponse);
+
         String response = given()
                 .log().all()
                 .port(port)
@@ -101,6 +114,32 @@ public class BlogIntegrationTest {
 
                 .when()
                 .get("/api/articles/" + id)
+
+                .then()
+                .statusCode(OK.value())
+                .assertThat().body("$", x -> hasKey("id"))
+                .assertThat().body("$", x -> hasKey("title"))
+                .assertThat().body("$", x -> hasKey("content"))
+                .assertThat().body("$", x -> hasKey("createdAt"))
+                .assertThat().body("$", x -> hasKey("updatedAt"))
+                .extract()
+                .asString();
+
+        JsonElement element = JsonParser.parseString(response);
+        System.out.println(gson.toJson(element));
+    }
+
+    private void updateArticle() {
+        String response = given()
+                .log().all()
+                .port(port)
+                .accept(APPLICATION_JSON_VALUE)
+                .contentType(APPLICATION_JSON_VALUE)
+                .header(AUTHORIZATION, TOKEN)
+                .body(updateArticleRequest())
+
+                .when()
+                .put("/api/articles")
 
                 .then()
                 .statusCode(OK.value())
