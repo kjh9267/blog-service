@@ -1,6 +1,8 @@
 package me.jun.blogservice.core.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;
@@ -19,6 +21,10 @@ public class CreateArticleRequest {
     @NotBlank
     private String content;
 
+    @NotNull
+    @Positive
+    private Long categoryId;
+
     private Long writerId;
 
     public Article toEntity() {
@@ -34,6 +40,7 @@ public class CreateArticleRequest {
         return Article.builder()
                 .articleInfo(articleInfo)
                 .writer(writer)
+                .categoryId(categoryId)
                 .build();
     }
 }

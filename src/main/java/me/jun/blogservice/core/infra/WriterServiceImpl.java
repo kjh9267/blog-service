@@ -2,6 +2,7 @@ package me.jun.blogservice.core.infra;
 
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.WriterService;
+import me.jun.blogservice.core.application.dto.WriterResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,7 +26,9 @@ public class WriterServiceImpl implements WriterService {
         return writerWebClient.get()
                 .uri(writerUri + "/" + email)
                 .retrieve()
-                .bodyToMono(Object.class)
+                .bodyToMono(WriterResponse.class)
+                .map(writer -> writer.getId())
+                .map(id -> (Object) id)
                 .log()
                 .doOnError(throwable -> log.info("{}", throwable));
     }
