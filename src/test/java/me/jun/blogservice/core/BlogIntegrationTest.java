@@ -62,6 +62,7 @@ public class BlogIntegrationTest {
         createArticle();
         retrieveArticle(1L);
         updateArticle();
+        deleteArticle(1L);
     }
 
     private void createArticle() {
@@ -148,6 +149,32 @@ public class BlogIntegrationTest {
                 .assertThat().body("$", x -> hasKey("content"))
                 .assertThat().body("$", x -> hasKey("createdAt"))
                 .assertThat().body("$", x -> hasKey("updatedAt"))
+                .extract()
+                .asString();
+
+        JsonElement element = JsonParser.parseString(response);
+        System.out.println(gson.toJson(element));
+    }
+
+    private void deleteArticle(Long id) {
+        MockResponse mockResponse = new MockResponse()
+                .setResponseCode(OK.value())
+                .setHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setBody(WRITER_RESPONSE_JSON);
+
+        mockWebServer.url(WRITER_BASE_URL + ":" + mockWebServer.getPort() + WRITER_URI + "/" + WRITER_EMAIL);
+        mockWebServer.enqueue(mockResponse);
+
+        String response = given()
+                .log().all()
+                .port(port)
+                .header(AUTHORIZATION, TOKEN)
+
+                .when()
+                .delete("/api/articles/" + id)
+
+                .then()
+                .statusCode(OK.value())
                 .extract()
                 .asString();
 
