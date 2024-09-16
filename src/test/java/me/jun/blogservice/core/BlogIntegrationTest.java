@@ -56,6 +56,7 @@ public class BlogIntegrationTest {
     @Test
     void blogTest() {
         createArticle();
+        retrieveArticle(1L);
     }
 
     private void createArticle() {
@@ -77,6 +78,29 @@ public class BlogIntegrationTest {
 
                 .when()
                 .post("/api/articles")
+
+                .then()
+                .statusCode(OK.value())
+                .assertThat().body("$", x -> hasKey("id"))
+                .assertThat().body("$", x -> hasKey("title"))
+                .assertThat().body("$", x -> hasKey("content"))
+                .assertThat().body("$", x -> hasKey("createdAt"))
+                .assertThat().body("$", x -> hasKey("updatedAt"))
+                .extract()
+                .asString();
+
+        JsonElement element = JsonParser.parseString(response);
+        System.out.println(gson.toJson(element));
+    }
+
+    private void retrieveArticle(Long id) {
+        String response = given()
+                .log().all()
+                .port(port)
+                .accept(APPLICATION_JSON_VALUE)
+
+                .when()
+                .get("/api/articles/" + id)
 
                 .then()
                 .statusCode(OK.value())
