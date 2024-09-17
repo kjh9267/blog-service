@@ -6,6 +6,7 @@ import me.jun.blogservice.core.domain.Category;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(toBuilder = true)
+@EqualsAndHashCode
 @Getter
 public class CategoryResponse {
 

@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.awt.print.Pageable;
+import java.util.List;
+
 import static me.jun.blogservice.support.CategoryFixture.category;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -36,7 +39,7 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    void findAllTest() {
+    void findAllByTest() {
         int expected = 10;
 
         for (int count = 0; count < 20; count++) {
@@ -47,9 +50,9 @@ public class CategoryRepositoryTest {
             );
         }
 
-        Page<Category> page = categoryRepository.findAll(PageRequest.of(0, 10));
+        List<Category> categories = categoryRepository.findAllBy(PageRequest.of(0, 10));
 
-        assertThat(page.getSize())
+        assertThat(categories.size())
                 .isEqualTo(expected);
     }
 }

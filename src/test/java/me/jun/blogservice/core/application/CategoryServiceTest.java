@@ -1,5 +1,6 @@
 package me.jun.blogservice.core.application;
 
+import me.jun.blogservice.core.application.dto.CategoryListResponse;
 import me.jun.blogservice.core.application.dto.CategoryResponse;
 import me.jun.blogservice.core.application.exception.CategoryNotFoundException;
 import me.jun.blogservice.core.domain.repository.CategoryRepository;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -85,5 +87,16 @@ class CategoryServiceTest {
                 CategoryNotFoundException.class,
                 () -> categoryService.updateCategory(Mono.just(updateCategoryRequest())).block()
         );
+    }
+
+    @Test
+    void retrieveCategoryListTest() {
+        CategoryListResponse expected = categoryListResponse();
+
+        given(categoryRepository.findAllBy(any()))
+                .willReturn(categoryList());
+
+        assertThat(categoryService.retrieveCategoryList(Mono.just(PageRequest.of(0, 10))).block())
+                .isEqualToComparingFieldByField(expected);
     }
 }
