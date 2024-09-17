@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.dto.*;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import me.jun.blogservice.core.domain.repository.ArticleRepository;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -57,10 +57,10 @@ public class ArticleService {
                 .flatMap(request -> Mono.empty());
     }
 
-    public Mono<PagedArticleResponse> retrievePagedArticle(Mono<Pageable> requestMono) {
+    public Mono<ArticleListResponse> retrieveArticleList(Mono<PageRequest> requestMono) {
         return requestMono.log()
-                .map(request -> articleRepository.findAll(request))
-                .map(PagedArticleResponse::of)
+                .map(request -> articleRepository.findAllBy(request))
+                .map(ArticleListResponse::of)
                 .doOnError(throwable -> log.info("{}", throwable));
     }
 }
