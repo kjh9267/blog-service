@@ -66,7 +66,7 @@ abstract public class CategoryFixture {
     }
 
     public static List<Category> categoryList() {
-        return LongStream.rangeClosed(0, 10)
+        return LongStream.rangeClosed(1, 10)
                 .mapToObj(
                         id -> category()
                                 .toBuilder()
