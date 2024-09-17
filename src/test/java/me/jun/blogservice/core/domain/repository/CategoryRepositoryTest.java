@@ -4,14 +4,13 @@ import me.jun.blogservice.core.domain.Category;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
+import static me.jun.blogservice.support.CategoryFixture.CATEGORY_NAME;
 import static me.jun.blogservice.support.CategoryFixture.category;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -35,6 +34,20 @@ public class CategoryRepositoryTest {
         categoryRepository.save(category);
 
         assertThat(categoryRepository.findById(1L).get())
+                .isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    void findByNameTest() {
+        Category expected = category();
+
+        categoryRepository.save(
+                category().toBuilder()
+                        .id(null)
+                        .build()
+        );
+
+        assertThat(categoryRepository.findByName(CATEGORY_NAME).get())
                 .isEqualToComparingFieldByField(expected);
     }
 

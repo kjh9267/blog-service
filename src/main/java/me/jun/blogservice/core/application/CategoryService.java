@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+
 @Slf4j
 @Service
 @Transactional
@@ -54,7 +56,10 @@ public class CategoryService {
     public Mono<CategoryListResponse> retrieveCategoryList(Mono<PageRequest> requestMono) {
         return requestMono.log()
                 .map(request -> categoryRepository.findAllBy(request))
-                .map(CategoryListResponse::of)
+                .map(categories -> {
+                    System.out.println(Arrays.toString(categories.toArray()));
+                    return CategoryListResponse.of(categories);
+                })
                 .doOnError(throwable -> log.info("{}", throwable));
     }
 }
