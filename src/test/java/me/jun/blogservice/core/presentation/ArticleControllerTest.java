@@ -411,4 +411,19 @@ public class ArticleControllerTest {
                 .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
+
+    @Test
+    void retrieveArticleListTest() {
+        given(articleService.retrieveArticleList(any()))
+                .willReturn(Mono.just(articleListResponse()));
+
+        webTestClient.get()
+                .uri("/api/articles/query?page=0&size=10")
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("articleResponses").exists()
+                .consumeWith(System.out::println);
+    }
 }

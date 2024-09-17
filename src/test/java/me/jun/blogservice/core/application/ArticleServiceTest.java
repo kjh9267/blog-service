@@ -1,7 +1,7 @@
 package me.jun.blogservice.core.application;
 
+import me.jun.blogservice.core.application.dto.ArticleListResponse;
 import me.jun.blogservice.core.application.dto.ArticleResponse;
-import me.jun.blogservice.core.application.dto.PagedArticleResponse;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.Writer;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -124,13 +123,13 @@ public class ArticleServiceTest {
     }
 
     @Test
-    void retrievePagedArticleTest() {
-        PagedArticleResponse expected = pagedArticleResponse();
+    void retrieveArticleListTest() {
+        ArticleListResponse expected = articleListResponse();
 
-        given(articleRepository.findAll((Pageable) any()))
-                .willReturn(pagedArticles());
+        given(articleRepository.findAllBy(any()))
+                .willReturn(articleList());
 
-        assertThat(articleService.retrievePagedArticle(Mono.just(PageRequest.of(0, 10))).block())
+        assertThat(articleService.retrieveArticleList(Mono.just(PageRequest.of(0, 10))).block())
                 .isEqualToComparingFieldByField(expected);
     }
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.common.security.WriterId;
 import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.dto.*;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -26,13 +27,13 @@ public class ArticleController {
     )
     public Mono<ResponseEntity<ArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request, @WriterId Long writerId) {
         return articleService.createArticle(
-                Mono.fromSupplier(
-                        () -> request.toBuilder()
-                                .writerId(writerId)
-                                .build()
+                        Mono.fromSupplier(
+                                        () -> request.toBuilder()
+                                                .writerId(writerId)
+                                                .build()
+                                )
+                                .log()
                 )
-                        .log()
-        )
                 .log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
@@ -46,10 +47,10 @@ public class ArticleController {
     )
     public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
         return articleService.retrieveArticle(
-                Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
-                        .log()
-                        .doOnError(throwable -> log.info("{}", throwable))
-        )
+                        Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
+                                .log()
+                                .doOnError(throwable -> log.info("{}", throwable))
+                )
                 .log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
@@ -63,13 +64,13 @@ public class ArticleController {
     )
     public Mono<ResponseEntity<ArticleResponse>> updateArticle(@RequestBody @Valid UpdateArticleRequest request, @WriterId Long writerId) {
         return articleService.updateArticle(
-                Mono.fromSupplier(
-                        () -> request.toBuilder()
-                                .writerId(writerId)
-                                .build()
-                        )
-                        .log()
-        )
+                        Mono.fromSupplier(
+                                        () -> request.toBuilder()
+                                                .writerId(writerId)
+                                                .build()
+                                )
+                                .log()
+                )
                 .log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse))
@@ -79,12 +80,32 @@ public class ArticleController {
     @DeleteMapping(value = "/{articleId}")
     public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
         return articleService.deleteArticle(
-                Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
-                        .log()
-        )
+                        Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
+                                .log()
+                )
                 .log()
                 .map(empty -> ResponseEntity.ok()
                         .body(empty))
+                .doOnError(throwable -> log.info("{}", throwable));
+    }
+
+    @GetMapping(
+            value = "/query",
+            produces = APPLICATION_JSON_VALUE
+    )
+    public Mono<ResponseEntity<ArticleListResponse>> retrieveArticleList(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
+        return articleService.retrieveArticleList(
+                        Mono.fromSupplier(() -> PageRequest.of(page, size))
+                                .log()
+                                .doOnError(throwable -> log.info("{}", throwable))
+                )
+                .log()
+                .map(response -> ResponseEntity.ok()
+                        .body(response)
+                )
                 .doOnError(throwable -> log.info("{}", throwable));
     }
 }

@@ -4,10 +4,11 @@ import me.jun.blogservice.core.domain.Article;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static java.time.Instant.now;
 import static me.jun.blogservice.support.ArticleFixture.article;
@@ -49,7 +50,7 @@ public class ArticleRepositoryTest {
     }
 
     @Test
-    void findAllTest() {
+    void findAllByTest() {
         int expected = 10;
 
         for (int count = 0; count < 20; count++) {
@@ -60,9 +61,9 @@ public class ArticleRepositoryTest {
             );
         }
 
-        Page<Article> page = articleRepository.findAll(PageRequest.of(0, 10));
+        List<Article> articles = articleRepository.findAllBy(PageRequest.of(0, 10));
 
-        assertThat(page.getSize())
+        assertThat(articles.size())
                         .isEqualTo(expected);
     }
 }

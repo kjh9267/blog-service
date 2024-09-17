@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 import me.jun.blogservice.core.application.dto.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.time.Instant;
 import java.util.List;
@@ -144,11 +142,7 @@ abstract public class ArticleFixture {
                 .collect(Collectors.toList());
     }
 
-    public static Page<Article> pagedArticles() {
-        return new PageImpl<>(articleList());
-    }
-
-    public static PagedArticleResponse pagedArticleResponse() {
-        return PagedArticleResponse.of(pagedArticles());
+    public static ArticleListResponse articleListResponse() {
+        return ArticleListResponse.of(articleList());
     }
 }
