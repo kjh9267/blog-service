@@ -55,14 +55,20 @@ public class BlogIntegrationTest {
     }
 
     @Test
-    void
-
-
-    blogTest() {
+    void blogTest() {
         createArticle();
         retrieveArticle(1L);
         updateArticle();
         deleteArticle(1L);
+    }
+
+    @Test
+    void retrieveArticleListTest() {
+        for (int count = 0; count < 10; count++) {
+            createArticle();
+        }
+
+        retrieveArticleList(0, 10);
     }
 
     private void createArticle() {
@@ -175,6 +181,27 @@ public class BlogIntegrationTest {
 
                 .then()
                 .statusCode(OK.value())
+                .extract()
+                .asString();
+
+        JsonElement element = JsonParser.parseString(response);
+        System.out.println(gson.toJson(element));
+    }
+
+    private void retrieveArticleList(int page, int size) {
+        String response = given()
+                .log().all()
+                .port(port)
+                .accept(APPLICATION_JSON_VALUE)
+                .queryParam("page", page)
+                .queryParam("size", size)
+
+                .when()
+                .get("/api/articles/query")
+
+                .then()
+                .statusCode(OK.value())
+                .assertThat().body("$", x -> hasKey("articleResponses"))
                 .extract()
                 .asString();
 
