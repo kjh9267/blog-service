@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import me.jun.blogservice.core.application.dto.CreateArticleRequest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -56,7 +57,7 @@ public class BlogIntegrationTest {
 
     @Test
     void blogTest() {
-        createArticle();
+        createArticle(1L);
         retrieveArticle(1L);
         updateArticle();
         deleteArticle(1L);
@@ -64,14 +65,27 @@ public class BlogIntegrationTest {
 
     @Test
     void retrieveArticleListTest() {
-        for (int count = 0; count < 10; count++) {
-            createArticle();
+        for (long categoryId = 1; categoryId <= 10; categoryId++) {
+            createArticle(categoryId);
         }
 
         retrieveArticleList(0, 10);
     }
 
-    private void createArticle() {
+    @Test
+    void retrieveCategoryListTest() {
+        for (long categoryId = 1; categoryId <= 10; categoryId++) {
+            createArticle(categoryId);
+        }
+
+        retrieveCategoryList(0, 10);
+    }
+
+    private void createArticle(Long categoryId) {
+        CreateArticleRequest request = createArticleRequest().toBuilder()
+                .categoryId(categoryId)
+                .build();
+
         MockResponse mockResponse = new MockResponse()
                 .setResponseCode(OK.value())
                 .setHeader(CONTENT_TYPE, APPLICATION_JSON)
@@ -86,7 +100,7 @@ public class BlogIntegrationTest {
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
                 .header(AUTHORIZATION, TOKEN)
-                .body(createArticleRequest())
+                .body(request)
 
                 .when()
                 .post("/api/articles")
@@ -202,6 +216,27 @@ public class BlogIntegrationTest {
                 .then()
                 .statusCode(OK.value())
                 .assertThat().body("$", x -> hasKey("articleResponses"))
+                .extract()
+                .asString();
+
+        JsonElement element = JsonParser.parseString(response);
+        System.out.println(gson.toJson(element));
+    }
+
+    private void retrieveCategoryList(int page, int size) {
+        String response = given()
+                .log().all()
+                .port(port)
+                .accept(APPLICATION_JSON_VALUE)
+                .queryParam("page", page)
+                .queryParam("size", size)
+
+                .when()
+                .get("/api/categories/query")
+
+                .then()
+                .statusCode(OK.value())
+                .assertThat().body("$", x -> hasKey("categoryResponses"))
                 .extract()
                 .asString();
 
