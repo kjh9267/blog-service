@@ -23,8 +23,9 @@ public class WriterServiceImpl implements WriterService {
 
     @Override
     public Mono<Object> retrieveWriterIdByEmail(String email) {
-        return writerWebClient.get()
-                .uri(writerUri + "/" + email)
+        return writerWebClient.post()
+                .uri(writerUri)
+                .body(Mono.just(email), String.class)
                 .retrieve()
                 .bodyToMono(WriterResponse.class)
                 .map(writer -> writer.getId())
