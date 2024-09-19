@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static me.jun.blogservice.support.CategoryFixture.CATEGORY_NAME;
 import static me.jun.blogservice.support.WriterFixture.writer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -90,7 +91,7 @@ abstract public class ArticleFixture {
                 .title(TITLE)
                 .content(CONTENT)
                 .writerId(WRITER_ID)
-                .categoryId(CATEGORY_ID)
+                .categoryName(CATEGORY_NAME)
                 .build();
     }
 

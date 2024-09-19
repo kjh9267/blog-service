@@ -2,7 +2,9 @@ package me.jun.blogservice.core.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.jun.blogservice.core.application.dto.*;
+import me.jun.blogservice.core.application.dto.CategoryListResponse;
+import me.jun.blogservice.core.application.dto.CategoryResponse;
+import me.jun.blogservice.core.application.dto.RetrieveCategoryRequest;
 import me.jun.blogservice.core.application.exception.CategoryNotFoundException;
 import me.jun.blogservice.core.domain.Category;
 import me.jun.blogservice.core.domain.repository.CategoryRepository;
@@ -19,12 +21,9 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public Mono<Category> createCategoryOrElseGet(Mono<String> categoryNameMono) {
-        return categoryNameMono.log()
-                .map(categoryName -> categoryRepository.findByName(categoryName)
-                                .orElseGet(() -> categoryRepository.save(Category.of(categoryName)))
-                )
-                .doOnError(throwable -> log.info("{}", throwable));
+    public Category createCategoryOrElseGet(String categoryName) {
+        return categoryRepository.findByName(categoryName)
+                .orElseGet(() -> categoryRepository.save(Category.of(categoryName)));
     }
 
     public Mono<CategoryResponse> retrieveCategoryById(Mono<RetrieveCategoryRequest> requestMono) {

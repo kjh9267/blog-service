@@ -57,7 +57,7 @@ public class BlogIntegrationTest {
 
     @Test
     void blogTest() {
-        createArticle(1L);
+        createArticle("category name");
         retrieveArticle(1L);
         updateArticle();
         deleteArticle(1L);
@@ -66,7 +66,7 @@ public class BlogIntegrationTest {
     @Test
     void retrieveArticleListTest() {
         for (long categoryId = 1; categoryId <= 10; categoryId++) {
-            createArticle(categoryId);
+            createArticle(String.valueOf(categoryId));
         }
 
         retrieveArticleList(0, 10);
@@ -75,15 +75,15 @@ public class BlogIntegrationTest {
     @Test
     void retrieveCategoryListTest() {
         for (long categoryId = 1; categoryId <= 10; categoryId++) {
-            createArticle(categoryId);
+            createArticle(String.valueOf(categoryId));
         }
 
         retrieveCategoryList(0, 10);
     }
 
-    private void createArticle(Long categoryId) {
+    private void createArticle(String categoryName) {
         CreateArticleRequest request = createArticleRequest().toBuilder()
-                .categoryId(categoryId)
+                .categoryName(categoryName)
                 .build();
 
         MockResponse mockResponse = new MockResponse()
