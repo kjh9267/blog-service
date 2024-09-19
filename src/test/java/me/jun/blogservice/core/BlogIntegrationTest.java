@@ -91,7 +91,7 @@ public class BlogIntegrationTest {
                 .setHeader(CONTENT_TYPE, APPLICATION_JSON)
                 .setBody(WRITER_RESPONSE_JSON);
 
-        mockWebServer.url(WRITER_BASE_URL + ":" + mockWebServer.getPort() + WRITER_URI + "/" + WRITER_EMAIL);
+        mockWebServer.url(WRITER_BASE_URL);
         mockWebServer.enqueue(mockResponse);
 
         String response = given()
@@ -125,7 +125,7 @@ public class BlogIntegrationTest {
                 .setHeader(CONTENT_TYPE, APPLICATION_JSON)
                 .setBody(WRITER_RESPONSE_JSON);
 
-        mockWebServer.url(WRITER_BASE_URL + ":" + mockWebServer.getPort() + WRITER_URI + "/" + WRITER_EMAIL);
+        mockWebServer.url(WRITER_BASE_URL);
         mockWebServer.enqueue(mockResponse);
 
         String response = given()
@@ -182,7 +182,7 @@ public class BlogIntegrationTest {
                 .setHeader(CONTENT_TYPE, APPLICATION_JSON)
                 .setBody(WRITER_RESPONSE_JSON);
 
-        mockWebServer.url(WRITER_BASE_URL + ":" + mockWebServer.getPort() + WRITER_URI + "/" + WRITER_EMAIL);
+        mockWebServer.url(WRITER_BASE_URL);
         mockWebServer.enqueue(mockResponse);
 
         String response = given()

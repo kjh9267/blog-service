@@ -16,8 +16,6 @@ abstract public class CategoryFixture {
 
     public static final String CATEGORY_NAME = "category name string";
 
-    public static final String NEW_CATEGORY_NAME = "new category name string";
-
     public static final Long INITIAL_MAPPED_ARTICLE_COUNT = 0L;
 
     public static final Long MAPPED_ARTICLE_COUNT = 1L;
@@ -38,12 +36,6 @@ abstract public class CategoryFixture {
                 .build();
     }
 
-    public static CreateCategoryRequest createCategoryRequest() {
-        return CreateCategoryRequest.builder()
-                .name(CATEGORY_NAME)
-                .build();
-    }
-
     public static CategoryResponse categoryResponse() {
         return CategoryResponse.builder()
                 .id(CATEGORY_ID)
@@ -55,13 +47,6 @@ abstract public class CategoryFixture {
     public static RetrieveCategoryRequest retrieveCategoryRequest() {
         return RetrieveCategoryRequest.builder()
                 .id(CATEGORY_ID)
-                .build();
-    }
-
-    public static UpdateCategoryRequest updateCategoryRequest() {
-        return UpdateCategoryRequest.builder()
-                .id(category().getId())
-                .name(NEW_CATEGORY_NAME)
                 .build();
     }
 
