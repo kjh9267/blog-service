@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.dto.*;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
+import me.jun.blogservice.core.domain.Category;
 import me.jun.blogservice.core.domain.repository.ArticleRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,19 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
 
+    private final CategoryService categoryService;
 
     public Mono<ArticleResponse> createArticle(Mono<CreateArticleRequest> requestMono) {
         return requestMono.log()
-                .map(CreateArticleRequest::toEntity)
+                .map(
+                        request -> {
+                            Category category = categoryService.createCategoryOrElseGet(request.getCategoryName());
+                            return request.toEntity()
+                                    .toBuilder()
+                                    .categoryId(category.getId())
+                                    .build();
+                        }
+                )
                 .map(articleRepository::save)
                 .map(ArticleResponse::of)
                 .doOnError(throwable -> log.info("{}", throwable));

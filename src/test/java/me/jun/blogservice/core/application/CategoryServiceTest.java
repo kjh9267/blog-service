@@ -3,6 +3,7 @@ package me.jun.blogservice.core.application;
 import me.jun.blogservice.core.application.dto.CategoryListResponse;
 import me.jun.blogservice.core.application.dto.CategoryResponse;
 import me.jun.blogservice.core.application.exception.CategoryNotFoundException;
+import me.jun.blogservice.core.domain.Category;
 import me.jun.blogservice.core.domain.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,56 +37,48 @@ class CategoryServiceTest {
 
     @Test
     void createCategoryTest() {
-        CategoryResponse expected = categoryResponse();
+        Category expected = initialCategory();
+
+        given(categoryRepository.findByName(any()))
+                .willReturn(Optional.empty());
 
         given(categoryRepository.save(any()))
                 .willReturn(initialCategory());
 
-        assertThat(categoryService.createCategory(Mono.just(createCategoryRequest())).block())
+        assertThat(categoryService.createCategoryOrElseGet(CATEGORY_NAME))
                 .isEqualToComparingFieldByField(expected);
     }
 
     @Test
-    void retrieveCategoryTest() {
+    void getCategoryTest() {
+        Category expected = initialCategory();
+
+        given(categoryRepository.findByName(any()))
+                .willReturn(Optional.of(initialCategory()));
+
+        assertThat(categoryService.createCategoryOrElseGet(CATEGORY_NAME))
+                .isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    void retrieveCategoryByIdTest() {
         CategoryResponse expected = categoryResponse();
 
         given(categoryRepository.findById(any()))
                 .willReturn(Optional.of(initialCategory()));
 
-        assertThat(categoryService.retrieveCategory(Mono.just(retrieveCategoryRequest())).block())
+        assertThat(categoryService.retrieveCategoryById(Mono.just(retrieveCategoryRequest())).block())
                 .isEqualToComparingFieldByField(expected);
     }
 
     @Test
-    void noCategory_retrieveCategoryFailTest() {
+    void noCategory_retrieveCategoryByIdFailTest() {
         given(categoryRepository.findById(any()))
                 .willThrow(CategoryNotFoundException.of(String.valueOf(CATEGORY_ID)));
 
         assertThrows(
                 CategoryNotFoundException.class,
-                () -> categoryService.retrieveCategory(Mono.just(retrieveCategoryRequest())).block()
-        );
-    }
-
-    @Test
-    void updateCategoryTest() {
-        CategoryResponse expected = categoryResponse();
-
-        given(categoryRepository.findById(any()))
-                .willReturn(Optional.of(initialCategory()));
-
-        assertThat(categoryService.updateCategory(Mono.just(updateCategoryRequest())).block())
-                .isEqualToComparingFieldByField(expected);
-    }
-
-    @Test
-    void noCategory_updateCategoryFailTest() {
-        given(categoryRepository.findById(any()))
-                .willThrow(CategoryNotFoundException.of(String.valueOf(CATEGORY_ID)));
-
-        assertThrows(
-                CategoryNotFoundException.class,
-                () -> categoryService.updateCategory(Mono.just(updateCategoryRequest())).block()
+                () -> categoryService.retrieveCategoryById(Mono.just(retrieveCategoryRequest())).block()
         );
     }
 

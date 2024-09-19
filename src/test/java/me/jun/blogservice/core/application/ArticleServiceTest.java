@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
+import static me.jun.blogservice.support.CategoryFixture.category;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,14 +35,23 @@ public class ArticleServiceTest {
     @Mock
     private ArticleRepository articleRepository;
 
+    @Mock
+    private CategoryService categoryService;
+
     @BeforeEach
     void setUp() {
-        articleService = new ArticleService(articleRepository);
+        articleService = new ArticleService(
+                articleRepository,
+                categoryService
+        );
     }
 
     @Test
     void createArticleTest() {
         ArticleResponse expected = articleResponse();
+
+        given(categoryService.createCategoryOrElseGet(any()))
+                .willReturn(category());
 
         given(articleRepository.save(any()))
                 .willReturn(article());

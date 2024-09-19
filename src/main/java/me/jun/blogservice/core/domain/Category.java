@@ -35,7 +35,7 @@ public class Category {
     public static Category of(String name) {
         return Category.builder()
                 .name(name)
-                .mappedArticleCount(0L)
+                .mappedArticleCount(1L)
                 .build();
     }
 }
