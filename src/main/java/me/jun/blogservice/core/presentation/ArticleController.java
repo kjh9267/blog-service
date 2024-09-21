@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static reactor.core.scheduler.Schedulers.boundedElastic;
 
 @Slf4j
 @RestController
@@ -26,19 +27,19 @@ public class ArticleController {
             produces = APPLICATION_JSON_VALUE
     )
     public Mono<ResponseEntity<ArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request, @WriterId Long writerId) {
-        return articleService.createArticle(
-                        Mono.fromSupplier(
-                                        () -> request.toBuilder()
-                                                .writerId(writerId)
-                                                .build()
-                                )
-                                .log()
+        Mono<CreateArticleRequest> requestMono = Mono.fromSupplier(
+                        () -> request.toBuilder()
+                                .writerId(writerId)
+                                .build()
                 )
                 .log()
+                .publishOn(boundedElastic());
+
+        return articleService.createArticle(requestMono)
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
                 )
-                .doOnError(throwable -> log.info("{}", throwable));
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @GetMapping(
@@ -46,16 +47,15 @@ public class ArticleController {
             produces = APPLICATION_JSON_VALUE
     )
     public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
-        return articleService.retrieveArticle(
-                        Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
-                                .log()
-                                .doOnError(throwable -> log.info("{}", throwable))
-                )
+        Mono<RetrieveArticleRequest> requestMono = Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
                 .log()
+                .publishOn(boundedElastic());
+
+        return articleService.retrieveArticle(requestMono)
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
                 )
-                .doOnError(throwable -> log.info("{}", throwable));
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @PutMapping(
@@ -63,30 +63,30 @@ public class ArticleController {
             consumes = APPLICATION_JSON_VALUE
     )
     public Mono<ResponseEntity<ArticleResponse>> updateArticle(@RequestBody @Valid UpdateArticleRequest request, @WriterId Long writerId) {
-        return articleService.updateArticle(
-                        Mono.fromSupplier(
-                                        () -> request.toBuilder()
-                                                .writerId(writerId)
-                                                .build()
-                                )
-                                .log()
+        Mono<UpdateArticleRequest> requestMono = Mono.fromSupplier(
+                        () -> request.toBuilder()
+                                .writerId(writerId)
+                                .build()
                 )
                 .log()
+                .publishOn(boundedElastic());
+
+        return articleService.updateArticle(requestMono)
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse))
-                .doOnError(throwable -> log.info("{}", throwable));
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @DeleteMapping(value = "/{articleId}")
     public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
-        return articleService.deleteArticle(
-                        Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
-                                .log()
-                )
+        Mono<DeleteArticleRequest> requestMono = Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
                 .log()
+                .publishOn(boundedElastic());
+
+        return articleService.deleteArticle(requestMono)
                 .map(empty -> ResponseEntity.ok()
                         .body(empty))
-                .doOnError(throwable -> log.info("{}", throwable));
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @GetMapping(
@@ -97,15 +97,14 @@ public class ArticleController {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {
-        return articleService.retrieveArticleList(
-                        Mono.fromSupplier(() -> PageRequest.of(page, size))
-                                .log()
-                                .doOnError(throwable -> log.info("{}", throwable))
-                )
+        Mono<PageRequest> requestMono = Mono.fromSupplier(() -> PageRequest.of(page, size))
                 .log()
+                .publishOn(boundedElastic());
+
+        return articleService.retrieveArticleList(requestMono)
                 .map(response -> ResponseEntity.ok()
                         .body(response)
                 )
-                .doOnError(throwable -> log.info("{}", throwable));
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }
