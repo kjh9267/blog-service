@@ -10,7 +10,6 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static reactor.core.scheduler.Schedulers.boundedElastic;
@@ -43,14 +42,9 @@ public class JwtSubjectResolver implements HandlerMethodArgumentResolver {
             throw InvalidTokenException.of(e.getMessage());
         }
 
-        return Mono.fromSupplier(() -> jwtProvider.extractSubject(token))
-                .log()
-                .publishOn(boundedElastic())
-                .flatMap(
-                        email -> writerServiceImpl.retrieveWriterIdByEmail(email)
-                                .log()
-                                .doOnError(throwable -> log.info("{}", throwable))
-                )
+        return Mono.fromSupplier(() -> jwtProvider.extractSubject(token)).log()
+                .publishOn(boundedElastic()).log()
+                .flatMap(email -> writerServiceImpl.retrieveWriterIdByEmail(email)).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }

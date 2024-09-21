@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static reactor.core.scheduler.Schedulers.boundedElastic;
 
 @Slf4j
 @RestController
@@ -30,14 +31,15 @@ public class CategoryController {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {
-        return categoryService.retrieveCategoryList(
-                Mono.fromSupplier(() -> PageRequest.of(page, size))
-                        .log()
-                        .doOnError(throwable -> log.error("{}", throwable))
-        )
-                .log()
+        Mono<PageRequest> requestMono = Mono.fromSupplier(
+                        () -> PageRequest.of(page, size)
+                ).log()
+                .publishOn(boundedElastic()).log();
+
+        return categoryService.retrieveCategoryList(requestMono).log()
                 .map(response -> ResponseEntity.ok()
-                        .body(response))
-                .doOnError(throwable -> log.error("{}", throwable));
+                        .body(response)
+                ).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }

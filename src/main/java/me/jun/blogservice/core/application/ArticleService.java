@@ -24,15 +24,20 @@ public class ArticleService {
     public Mono<ArticleResponse> createArticle(Mono<CreateArticleRequest> requestMono) {
         return requestMono.map(
                 request -> {
-                    Category category = categoryService.createCategoryOrElseGet(request.getCategoryName());
+                    Mono<String> categoryNameMono = Mono.fromSupplier(
+                            () -> request.getCategoryName()
+                    ).log();
+
+                    Category category = categoryService.createCategoryOrElseGet(categoryNameMono).block();
                     return request.toEntity()
                             .toBuilder()
                             .categoryId(category.getId())
                             .build();
                         }
-                )
-                .map(articleRepository::save)
-                .map(ArticleResponse::of);
+                ).log()
+                .map(articleRepository::save).log()
+                .map(ArticleResponse::of).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     public Mono<ArticleResponse> retrieveArticle(Mono<RetrieveArticleRequest> requestMono) {
@@ -40,7 +45,8 @@ public class ArticleService {
                 request -> articleRepository.findById(request.getId())
                         .map(ArticleResponse::of)
                         .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
-                );
+                ).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     public Mono<ArticleResponse> updateArticle(Mono<UpdateArticleRequest> requestMono) {
@@ -51,18 +57,20 @@ public class ArticleService {
                         .map(article -> article.updateContent(request.getContent()))
                         .map(ArticleResponse::of)
                         .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
-        );
+                ).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     public Mono<Void> deleteArticle(Mono<DeleteArticleRequest> requestMono) {
         return requestMono
-                .doOnNext(request -> articleRepository.deleteById(request.getId()))
+                .doOnNext(request -> articleRepository.deleteById(request.getId())).log()
                 .flatMap(request -> Mono.empty());
     }
 
     public Mono<ArticleListResponse> retrieveArticleList(Mono<PageRequest> requestMono) {
         return requestMono
-                .map(request -> articleRepository.findAllBy(request))
-                .map(ArticleListResponse::of);
+                .map(request -> articleRepository.findAllBy(request)).log()
+                .map(ArticleListResponse::of).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }

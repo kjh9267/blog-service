@@ -27,8 +27,9 @@ public class WriterServiceImpl implements WriterService {
                 .uri(writerUri)
                 .body(Mono.just(email), String.class)
                 .retrieve()
-                .bodyToMono(WriterResponse.class)
-                .map(writer -> writer.getId())
-                .map(id -> id);
+                .bodyToMono(WriterResponse.class).log()
+                .map(writer -> writer.getId()).log()
+                .map(id -> (Object) id).log()
+                .doOnError(throwable -> throwable.getMessage());
     }
 }

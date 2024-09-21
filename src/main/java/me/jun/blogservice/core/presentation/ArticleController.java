@@ -31,14 +31,13 @@ public class ArticleController {
                         () -> request.toBuilder()
                                 .writerId(writerId)
                                 .build()
-                )
-                .log()
-                .publishOn(boundedElastic());
+                ).log()
+                .publishOn(boundedElastic()).log();
 
-        return articleService.createArticle(requestMono)
+        return articleService.createArticle(requestMono).log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
-                )
+                ).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
@@ -47,14 +46,15 @@ public class ArticleController {
             produces = APPLICATION_JSON_VALUE
     )
     public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
-        Mono<RetrieveArticleRequest> requestMono = Mono.fromSupplier(() -> RetrieveArticleRequest.of(articleId))
-                .log()
-                .publishOn(boundedElastic());
+        Mono<RetrieveArticleRequest> requestMono = Mono.fromSupplier(
+                () -> RetrieveArticleRequest.of(articleId)
+                ).log()
+                .publishOn(boundedElastic()).log();
 
-        return articleService.retrieveArticle(requestMono)
+        return articleService.retrieveArticle(requestMono).log()
                 .map(articleResponse -> ResponseEntity.ok()
                         .body(articleResponse)
-                )
+                ).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
@@ -67,25 +67,27 @@ public class ArticleController {
                         () -> request.toBuilder()
                                 .writerId(writerId)
                                 .build()
-                )
-                .log()
-                .publishOn(boundedElastic());
+                ).log()
+                .publishOn(boundedElastic()).log();
 
-        return articleService.updateArticle(requestMono)
+        return articleService.updateArticle(requestMono).log()
                 .map(articleResponse -> ResponseEntity.ok()
-                        .body(articleResponse))
+                        .body(articleResponse)
+                ).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @DeleteMapping(value = "/{articleId}")
     public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
-        Mono<DeleteArticleRequest> requestMono = Mono.fromSupplier(() -> DeleteArticleRequest.of(articleId))
-                .log()
-                .publishOn(boundedElastic());
+        Mono<DeleteArticleRequest> requestMono = Mono.fromSupplier(
+                () -> DeleteArticleRequest.of(articleId)
+                ).log()
+                .publishOn(boundedElastic()).log();
 
-        return articleService.deleteArticle(requestMono)
+        return articleService.deleteArticle(requestMono).log()
                 .map(empty -> ResponseEntity.ok()
-                        .body(empty))
+                        .body(empty)
+                ).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
@@ -97,14 +99,15 @@ public class ArticleController {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {
-        Mono<PageRequest> requestMono = Mono.fromSupplier(() -> PageRequest.of(page, size))
-                .log()
-                .publishOn(boundedElastic());
+        Mono<PageRequest> requestMono = Mono.fromSupplier(
+                () -> PageRequest.of(page, size)
+                ).log()
+                .publishOn(boundedElastic()).log();
 
-        return articleService.retrieveArticleList(requestMono)
+        return articleService.retrieveArticleList(requestMono).log()
                 .map(response -> ResponseEntity.ok()
                         .body(response)
-                )
+                ).log()
                 .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }
