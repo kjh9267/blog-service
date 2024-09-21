@@ -45,7 +45,7 @@ class CategoryServiceTest {
         given(categoryRepository.save(any()))
                 .willReturn(initialCategory());
 
-        assertThat(categoryService.createCategoryOrElseGet(CATEGORY_NAME))
+        assertThat(categoryService.createCategoryOrElseGet(Mono.just(CATEGORY_NAME)).block())
                 .isEqualToComparingFieldByField(expected);
     }
 
@@ -56,7 +56,7 @@ class CategoryServiceTest {
         given(categoryRepository.findByName(any()))
                 .willReturn(Optional.of(initialCategory()));
 
-        assertThat(categoryService.createCategoryOrElseGet(CATEGORY_NAME))
+        assertThat(categoryService.createCategoryOrElseGet(Mono.just(CATEGORY_NAME)).block())
                 .isEqualToComparingFieldByField(expected);
     }
 

@@ -51,7 +51,7 @@ public class ArticleServiceTest {
         ArticleResponse expected = articleResponse();
 
         given(categoryService.createCategoryOrElseGet(any()))
-                .willReturn(category());
+                .willReturn(Mono.just(category()));
 
         given(articleRepository.save(any()))
                 .willReturn(article());

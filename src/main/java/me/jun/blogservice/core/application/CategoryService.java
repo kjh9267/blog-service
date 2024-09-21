@@ -21,25 +21,28 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public Category createCategoryOrElseGet(String categoryName) {
-        return categoryRepository.findByName(categoryName)
-                .orElseGet(() -> categoryRepository.save(Category.of(categoryName)));
+    public Mono<Category> createCategoryOrElseGet(Mono<String> categoryNameMono) {
+        return categoryNameMono.map(
+                categoryName ->
+                        categoryRepository.findByName(categoryName)
+                                .orElseGet(() -> categoryRepository.save(Category.of(categoryName)))
+                ).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     public Mono<CategoryResponse> retrieveCategoryById(Mono<RetrieveCategoryRequest> requestMono) {
         return requestMono.map(
                 request -> categoryRepository.findById(request.getId())
                         .orElseThrow(() -> CategoryNotFoundException.of(String.valueOf(request.getId())))
-        )
-                .log()
-                .map(CategoryResponse::of)
-                .doOnError(throwable -> log.info("{}", throwable));
+                ).log()
+                .map(CategoryResponse::of).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     public Mono<CategoryListResponse> retrieveCategoryList(Mono<PageRequest> requestMono) {
-        return requestMono.log()
-                .map(request -> categoryRepository.findAllBy(request))
-                .map(categories -> CategoryListResponse.of(categories))
-                .doOnError(throwable -> log.info("{}", throwable));
+        return requestMono
+                .map(request -> categoryRepository.findAllBy(request)).log()
+                .map(categories -> CategoryListResponse.of(categories)).log()
+                .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 }
