@@ -14,7 +14,7 @@ import static me.jun.blogservice.support.CategoryFixture.CATEGORY_NAME;
 import static me.jun.blogservice.support.CategoryFixture.category;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@DataJpaTest
+@DataJpaTest(properties = "spring.cloud.config.enabled=false")
 @ActiveProfiles("test")
 @SuppressWarnings("deprecation")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
