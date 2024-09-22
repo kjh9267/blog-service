@@ -15,7 +15,7 @@ import static me.jun.blogservice.support.ArticleFixture.article;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DataJpaTest
+@DataJpaTest(properties = "spring.cloud.config.enabled=false")
 @ActiveProfiles("test")
 @SuppressWarnings("deprecation")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
