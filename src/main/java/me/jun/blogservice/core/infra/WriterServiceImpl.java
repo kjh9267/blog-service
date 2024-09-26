@@ -1,5 +1,6 @@
 package me.jun.blogservice.core.infra;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.WriterService;
 import me.jun.blogservice.core.application.dto.RetrieveWriterIdRequest;
@@ -28,6 +29,7 @@ public class WriterServiceImpl implements WriterService {
     }
 
     @Override
+    @CircuitBreaker(name = "writerCircuitBreaker")
     public Mono<Object> retrieveWriterIdByEmail(String email) {
         RetrieveWriterIdRequest request = RetrieveWriterIdRequest.builder()
                 .email(email)
