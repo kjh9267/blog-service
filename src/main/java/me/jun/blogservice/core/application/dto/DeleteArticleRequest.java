@@ -1,6 +1,6 @@
 package me.jun.blogservice.core.application.dto;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
