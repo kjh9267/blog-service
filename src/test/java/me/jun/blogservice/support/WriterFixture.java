@@ -13,8 +13,6 @@ abstract public class WriterFixture {
 
     public static final int WRITER_BASE_URL_PORT = 8080;
 
-    public static final String WRITER_URI = "/api/member";
-
     public static final String WRITER_EMAIL = "asdf@asdf.com";
 
     public static final String WRITER_RESPONSE_JSON = "{\"id\": 1, " +

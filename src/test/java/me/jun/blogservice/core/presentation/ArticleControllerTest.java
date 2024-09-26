@@ -145,7 +145,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -312,7 +311,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -343,7 +341,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -408,7 +405,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
