@@ -1,6 +1,6 @@
 package me.jun.blogservice.core.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import lombok.*;
 import me.jun.blogservice.core.domain.Article;
 import me.jun.blogservice.core.domain.ArticleInfo;

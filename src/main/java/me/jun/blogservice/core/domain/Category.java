@@ -1,6 +1,6 @@
 package me.jun.blogservice.core.domain;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

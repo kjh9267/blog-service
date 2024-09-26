@@ -1,9 +1,10 @@
 package me.jun.blogservice.core.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import lombok.*;
 import me.jun.blogservice.core.domain.exception.WriterMismatchException;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

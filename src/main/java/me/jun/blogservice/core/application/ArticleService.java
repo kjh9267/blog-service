@@ -36,8 +36,7 @@ public class ArticleService {
                         }
                 ).log()
                 .map(articleRepository::save).log()
-                .map(ArticleResponse::of).log()
-                .doOnError(throwable -> log.error(throwable.getMessage()));
+                .map(ArticleResponse::of);
     }
 
     public Mono<ArticleResponse> retrieveArticle(Mono<RetrieveArticleRequest> requestMono) {
@@ -45,8 +44,7 @@ public class ArticleService {
                 request -> articleRepository.findById(request.getId())
                         .map(ArticleResponse::of)
                         .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
-                ).log()
-                .doOnError(throwable -> log.error(throwable.getMessage()));
+                );
     }
 
     public Mono<ArticleResponse> updateArticle(Mono<UpdateArticleRequest> requestMono) {
@@ -57,8 +55,7 @@ public class ArticleService {
                         .map(article -> article.updateContent(request.getContent()))
                         .map(ArticleResponse::of)
                         .orElseThrow(() -> ArticleNotFoundException.of(String.valueOf(request.getId())))
-                ).log()
-                .doOnError(throwable -> log.error(throwable.getMessage()));
+                );
     }
 
     public Mono<Void> deleteArticle(Mono<DeleteArticleRequest> requestMono) {
@@ -70,7 +67,6 @@ public class ArticleService {
     public Mono<ArticleListResponse> retrieveArticleList(Mono<PageRequest> requestMono) {
         return requestMono
                 .map(request -> articleRepository.findAllBy(request)).log()
-                .map(ArticleListResponse::of).log()
-                .doOnError(throwable -> log.error(throwable.getMessage()));
+                .map(ArticleListResponse::of);
     }
 }

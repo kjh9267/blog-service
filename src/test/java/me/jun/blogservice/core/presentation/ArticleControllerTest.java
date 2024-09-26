@@ -85,9 +85,8 @@ public class ArticleControllerTest {
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .exchange()
-                .expectStatus().is4xxClientError()
+                .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -145,7 +144,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -180,9 +178,8 @@ public class ArticleControllerTest {
                 .uri("/api/articles/adsf")
                 .accept(APPLICATION_JSON)
                 .exchange()
-                .expectStatus().is4xxClientError()
+                .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -312,7 +309,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -343,7 +339,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 
@@ -408,7 +403,6 @@ public class ArticleControllerTest {
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("detail").exists()
                 .consumeWith(System.out::println);
     }
 

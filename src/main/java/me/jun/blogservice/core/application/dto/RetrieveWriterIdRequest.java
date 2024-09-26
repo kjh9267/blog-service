@@ -1,14 +1,12 @@
 package me.jun.blogservice.core.application.dto;
 
-import javax.validation.constraints.NotBlank;
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(toBuilder = true)
+@Builder
 @Getter
-public class CreateCategoryRequest {
+public class RetrieveWriterIdRequest {
 
-    @NotBlank
-    private String name;
+    private String email;
 }
