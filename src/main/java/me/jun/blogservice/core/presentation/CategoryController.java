@@ -1,5 +1,6 @@
 package me.jun.blogservice.core.presentation;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.core.application.CategoryService;
@@ -26,6 +27,10 @@ public class CategoryController {
     @GetMapping(
             value = "/query",
             produces = APPLICATION_JSON_VALUE
+    )
+    @Timed(
+            value = "categories.retrieveList",
+            longTask = true
     )
     public Mono<ResponseEntity<CategoryListResponse>> retrieveCategoryList(
             @RequestParam("page") int page,

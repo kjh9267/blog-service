@@ -1,5 +1,6 @@
 package me.jun.blogservice.core.presentation;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.jun.blogservice.common.security.WriterId;
@@ -27,6 +28,10 @@ public class ArticleController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
+    @Timed(
+            value = "articles.create",
+            longTask = true
+    )
     public Mono<ResponseEntity<ArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request, @WriterId Long writerId) {
         Mono<CreateArticleRequest> requestMono = Mono.fromSupplier(
                         () -> request.toBuilder()
@@ -46,6 +51,10 @@ public class ArticleController {
             value = "/{articleId}",
             produces = APPLICATION_JSON_VALUE
     )
+    @Timed(
+            value = "articles.retrieve",
+            longTask = true
+    )
     public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
         Mono<RetrieveArticleRequest> requestMono = Mono.fromSupplier(
                 () -> RetrieveArticleRequest.of(articleId)
@@ -63,6 +72,10 @@ public class ArticleController {
             produces = APPLICATION_JSON_VALUE,
             consumes = APPLICATION_JSON_VALUE
     )
+    @Timed(
+            value = "articles.update",
+            longTask = true
+    )
     public Mono<ResponseEntity<ArticleResponse>> updateArticle(@RequestBody @Valid UpdateArticleRequest request, @WriterId Long writerId) {
         Mono<UpdateArticleRequest> requestMono = Mono.fromSupplier(
                         () -> request.toBuilder()
@@ -79,6 +92,10 @@ public class ArticleController {
     }
 
     @DeleteMapping(value = "/{articleId}")
+    @Timed(
+            value = "articles.delete",
+            longTask = true
+    )
     public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
         Mono<DeleteArticleRequest> requestMono = Mono.fromSupplier(
                 () -> DeleteArticleRequest.of(articleId)
@@ -95,6 +112,10 @@ public class ArticleController {
     @GetMapping(
             value = "/query",
             produces = APPLICATION_JSON_VALUE
+    )
+    @Timed(
+            value = "articles.retrieveList",
+            longTask = true
     )
     public Mono<ResponseEntity<ArticleListResponse>> retrieveArticleList(
             @RequestParam("page") int page,
