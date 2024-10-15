@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.jun.blogservice.common.security.JwtProvider;
 import me.jun.blogservice.common.security.exception.InvalidTokenException;
 import me.jun.blogservice.core.application.ArticleService;
-import me.jun.blogservice.core.application.WriterService;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import me.jun.blogservice.core.domain.exception.WriterMismatchException;
 import org.junit.jupiter.api.Test;
@@ -15,13 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
-import static me.jun.blogservice.support.TokenFixture.EMAIL;
 import static me.jun.blogservice.support.TokenFixture.TOKEN;
-import static me.jun.blogservice.support.WriterFixture.WRITER_EMAIL;
+import static me.jun.blogservice.support.WriterFixture.WRITER_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -41,9 +38,6 @@ public class ArticleControllerTest {
     @MockBean
     private JwtProvider jwtProvider;
 
-    @MockBean
-    private WriterService writerServiceImpl;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -52,10 +46,7 @@ public class ArticleControllerTest {
         String content = objectMapper.writeValueAsString(createArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willReturn(WRITER_EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(WRITER_ID));
+                .willReturn(WRITER_ID.toString());
 
         given(articleService.createArticle(any()))
                 .willReturn(Mono.just(articleResponse()));
@@ -126,14 +117,14 @@ public class ArticleControllerTest {
     }
 
     @Test
-    void unknownWriter_createArticleFailTest() throws JsonProcessingException {
+    void invalidWriter_createArticleFailTest() throws JsonProcessingException {
         String content = objectMapper.writeValueAsString(createArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willReturn(WRITER_EMAIL);
+                .willReturn("2");
 
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willThrow(WebClientResponseException.class);
+        given(articleService.createArticle(any()))
+                .willThrow(WriterMismatchException.of("2"));
 
         webTestClient.post()
                 .uri("/api/articles")
@@ -142,7 +133,7 @@ public class ArticleControllerTest {
                 .header(AUTHORIZATION, TOKEN)
                 .bodyValue(content)
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().is4xxClientError()
                 .expectBody()
                 .consumeWith(System.out::println);
     }
@@ -150,10 +141,7 @@ public class ArticleControllerTest {
     @Test
     void retrieveArticleTest() {
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(WRITER_ID));
+                .willReturn(WRITER_ID.toString());
 
         given(articleService.retrieveArticle(any()))
                 .willReturn(Mono.just(articleResponse()));
@@ -203,10 +191,7 @@ public class ArticleControllerTest {
         String content = objectMapper.writeValueAsString(updateArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(WRITER_ID));
+                .willReturn(WRITER_ID.toString());
 
         given(articleService.updateArticle(any()))
                 .willReturn(Mono.just(articleResponse()));
@@ -269,10 +254,7 @@ public class ArticleControllerTest {
         String content = objectMapper.writeValueAsString(updateArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(2L));
+                .willReturn("2");
 
         given(articleService.updateArticle(any()))
                 .willThrow(WriterMismatchException.of("2"));
@@ -291,34 +273,9 @@ public class ArticleControllerTest {
     }
 
     @Test
-    void unknownWriter_updateArticleFailTest() throws JsonProcessingException {
-        String content = objectMapper.writeValueAsString(updateArticleRequest());
-
-        given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willThrow(WebClientResponseException.class);
-
-        webTestClient.put()
-                .uri("/api/articles")
-                .accept(APPLICATION_JSON)
-                .contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, TOKEN)
-                .bodyValue(content)
-                .exchange()
-                .expectStatus().is5xxServerError()
-                .expectBody()
-                .consumeWith(System.out::println);
-    }
-
-    @Test
     void deleteArticleTest() {
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(WRITER_ID));
+                .willReturn(WRITER_ID.toString());
 
         given(articleService.deleteArticle(any()))
                 .willReturn(Mono.empty());
@@ -345,10 +302,7 @@ public class ArticleControllerTest {
     @Test
     void noArticle_deleteArticleFailTest() {
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
-
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willReturn(Mono.just(WRITER_ID));
+                .willReturn(WRITER_ID.toString());
 
         given(articleService.deleteArticle(any()))
                 .willThrow(ArticleNotFoundException.of("1"));
@@ -390,18 +344,18 @@ public class ArticleControllerTest {
     }
 
     @Test
-    void unknownWriter_deleteArticleFailTest() {
+    void invalidWriter_deleteArticleFailTest() {
         given(jwtProvider.extractSubject(any()))
-                .willReturn(EMAIL);
+                .willReturn("2");
 
-        given(writerServiceImpl.retrieveWriterIdByEmail(any()))
-                .willThrow(WebClientResponseException.class);
+        given(articleService.deleteArticle(any()))
+                .willThrow(WriterMismatchException.of("2"));
 
         webTestClient.delete()
                 .uri("/api/articles/1")
                 .header(AUTHORIZATION, TOKEN)
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().is4xxClientError()
                 .expectBody()
                 .consumeWith(System.out::println);
     }

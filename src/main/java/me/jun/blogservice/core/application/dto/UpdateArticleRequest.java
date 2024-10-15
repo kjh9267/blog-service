@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 public class UpdateArticleRequest {
 
     @NotNull
+    @Positive
     private Long id;
 
     @NotBlank

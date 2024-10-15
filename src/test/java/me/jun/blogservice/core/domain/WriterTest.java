@@ -3,7 +3,7 @@ package me.jun.blogservice.core.domain;
 import me.jun.blogservice.core.domain.exception.WriterMismatchException;
 import org.junit.jupiter.api.Test;
 
-import static me.jun.blogservice.support.ArticleFixture.WRITER_ID;
+import static me.jun.blogservice.support.WriterFixture.WRITER_ID;
 import static me.jun.blogservice.support.WriterFixture.writer;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

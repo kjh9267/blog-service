@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import static me.jun.blogservice.support.CategoryFixture.CATEGORY_NAME;
+import static me.jun.blogservice.support.WriterFixture.WRITER_ID;
 import static me.jun.blogservice.support.WriterFixture.writer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,8 +29,6 @@ abstract public class ArticleFixture {
     public static final Instant UPDATED_AT = Instant.now();
 
     public static final Long CATEGORY_ID = 1L;
-
-    public static final Long WRITER_ID = 1L;
 
     public static final String NEW_TITLE = "new title string";
 

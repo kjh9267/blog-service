@@ -32,7 +32,10 @@ public class ArticleController {
             value = "articles.create",
             longTask = true
     )
-    public Mono<ResponseEntity<ArticleResponse>> createArticle(@RequestBody @Valid CreateArticleRequest request, @WriterId Long writerId) {
+    public Mono<ResponseEntity<ArticleResponse>> createArticle(
+            @RequestBody @Valid CreateArticleRequest request,
+            @WriterId Long writerId
+    ) {
         Mono<CreateArticleRequest> requestMono = Mono.fromSupplier(
                         () -> request.toBuilder()
                                 .writerId(writerId)
@@ -55,7 +58,9 @@ public class ArticleController {
             value = "articles.retrieve",
             longTask = true
     )
-    public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(@PathVariable Long articleId) {
+    public Mono<ResponseEntity<ArticleResponse>> retrieveArticle(
+            @PathVariable Long articleId
+    ) {
         Mono<RetrieveArticleRequest> requestMono = Mono.fromSupplier(
                 () -> RetrieveArticleRequest.of(articleId)
                 ).log()
@@ -76,7 +81,10 @@ public class ArticleController {
             value = "articles.update",
             longTask = true
     )
-    public Mono<ResponseEntity<ArticleResponse>> updateArticle(@RequestBody @Valid UpdateArticleRequest request, @WriterId Long writerId) {
+    public Mono<ResponseEntity<ArticleResponse>> updateArticle(
+            @RequestBody @Valid UpdateArticleRequest request,
+            @WriterId Long writerId
+    ) {
         Mono<UpdateArticleRequest> requestMono = Mono.fromSupplier(
                         () -> request.toBuilder()
                                 .writerId(writerId)
@@ -96,7 +104,10 @@ public class ArticleController {
             value = "articles.delete",
             longTask = true
     )
-    public Mono<ResponseEntity<Void>> deleteArticle(@PathVariable Long articleId, @WriterId Long writerId) {
+    public Mono<ResponseEntity<Void>> deleteArticle(
+            @PathVariable Long articleId,
+            @WriterId Long writerId
+    ) {
         Mono<DeleteArticleRequest> requestMono = Mono.fromSupplier(
                 () -> DeleteArticleRequest.of(articleId)
                 ).log()
