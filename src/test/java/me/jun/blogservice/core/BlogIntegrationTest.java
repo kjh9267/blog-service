@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import me.jun.blogservice.core.application.dto.CreateArticleRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -14,6 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import static io.restassured.RestAssured.given;
 import static me.jun.blogservice.support.ArticleFixture.createArticleRequest;
 import static me.jun.blogservice.support.ArticleFixture.updateArticleRequest;
+import static me.jun.blogservice.support.TokenFixture.createToken;
+import static me.jun.blogservice.support.WriterFixture.WRITER_ID;
 import static org.hamcrest.Matchers.hasKey;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
@@ -30,11 +33,16 @@ public class BlogIntegrationTest {
     @LocalServerPort
     private int port;
 
-    private static final String TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIn0.7V_35zv9H504I7nEce3JBe57tAJn8LiuqNDWAyO_exYmvC-G1iuoh13YTcQiLZnJgD7N961enYe-TUEHXav2Zg";
+    private static String token;
 
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
+
+    @BeforeEach
+    void setUp() {
+        token = createToken(WRITER_ID, 30L);
+    }
 
     @Test
     void blogTest() {
@@ -72,7 +80,7 @@ public class BlogIntegrationTest {
                 .port(port)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .body(request)
 
                 .when()
@@ -121,7 +129,7 @@ public class BlogIntegrationTest {
                 .port(port)
                 .accept(APPLICATION_JSON_VALUE)
                 .contentType(APPLICATION_JSON_VALUE)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .body(updateArticleRequest())
 
                 .when()
@@ -145,7 +153,7 @@ public class BlogIntegrationTest {
         String response = given()
                 .log().all()
                 .port(port)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
 
                 .when()
                 .delete("/api/articles/" + id)
