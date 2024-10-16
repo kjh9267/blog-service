@@ -7,6 +7,7 @@ import me.jun.blogservice.common.security.exception.InvalidTokenException;
 import me.jun.blogservice.core.application.ArticleService;
 import me.jun.blogservice.core.application.exception.ArticleNotFoundException;
 import me.jun.blogservice.core.domain.exception.WriterMismatchException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -17,7 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
-import static me.jun.blogservice.support.TokenFixture.TOKEN;
+import static me.jun.blogservice.support.TokenFixture.createToken;
 import static me.jun.blogservice.support.WriterFixture.WRITER_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -41,6 +42,13 @@ public class ArticleControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String token;
+
+    @BeforeEach
+    void setUp() {
+        token = createToken(WRITER_ID, 30L);
+    }
+
     @Test
     void createArticleTest() throws JsonProcessingException {
         String content = objectMapper.writeValueAsString(createArticleRequest());
@@ -55,7 +63,7 @@ public class ArticleControllerTest {
                 .uri("/api/articles")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -72,7 +80,7 @@ public class ArticleControllerTest {
     void noContent_createArticleFailTest() {
         webTestClient.post()
                 .uri("/api/articles")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .exchange()
@@ -102,7 +110,7 @@ public class ArticleControllerTest {
         String content = objectMapper.writeValueAsString(createArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willThrow(InvalidTokenException.of(TOKEN));
+                .willThrow(InvalidTokenException.of(token));
 
         webTestClient.post()
                 .uri("/api/articles")
@@ -130,7 +138,7 @@ public class ArticleControllerTest {
                 .uri("/api/articles")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is4xxClientError()
@@ -200,7 +208,7 @@ public class ArticleControllerTest {
                 .uri("/api/articles")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -234,11 +242,11 @@ public class ArticleControllerTest {
         String content = objectMapper.writeValueAsString(updateArticleRequest());
 
         given(jwtProvider.extractSubject(any()))
-                .willThrow(InvalidTokenException.of(TOKEN));
+                .willThrow(InvalidTokenException.of(token));
 
         webTestClient.put()
                 .uri("/api/articles")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(content)
@@ -263,7 +271,7 @@ public class ArticleControllerTest {
                 .uri("/api/articles")
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .bodyValue(content)
                 .exchange()
                 .expectStatus().is4xxClientError()
@@ -282,7 +290,7 @@ public class ArticleControllerTest {
 
         webTestClient.delete()
                 .uri("/api/articles/1")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
@@ -309,7 +317,7 @@ public class ArticleControllerTest {
 
         webTestClient.delete()
                 .uri("/api/articles/1")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
@@ -331,11 +339,11 @@ public class ArticleControllerTest {
     @Test
     void invalidToken_deleteArticleFailTest() {
         given(jwtProvider.extractSubject(any()))
-                .willThrow(InvalidTokenException.of(TOKEN));
+                .willThrow(InvalidTokenException.of(token));
 
         webTestClient.delete()
                 .uri("/api/articles/1")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
@@ -353,7 +361,7 @@ public class ArticleControllerTest {
 
         webTestClient.delete()
                 .uri("/api/articles/1")
-                .header(AUTHORIZATION, TOKEN)
+                .header(AUTHORIZATION, token)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
