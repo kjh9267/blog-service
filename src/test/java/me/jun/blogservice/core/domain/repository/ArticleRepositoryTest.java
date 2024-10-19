@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static java.time.Instant.now;
 import static me.jun.blogservice.support.ArticleFixture.article;
+import static me.jun.blogservice.support.WriterFixture.writer;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -65,5 +67,24 @@ public class ArticleRepositoryTest {
 
         assertThat(articles.size())
                         .isEqualTo(expected);
+    }
+
+    @Test
+    @Rollback(value = false)
+    void deleteAllByWriterTest() {
+        for (long id = 1; id <= 10; id++) {
+            Article article = article().toBuilder()
+                    .id(id)
+                    .build();
+
+            articleRepository.save(article);
+        }
+
+        articleRepository.deleteAllByWriter(writer());
+
+        for (long id = 1; id <= 10; id++) {
+            assertThat(articleRepository.findById(id))
+                    .isEmpty();
+        }
     }
 }
