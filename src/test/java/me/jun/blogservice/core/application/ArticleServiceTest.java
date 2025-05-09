@@ -13,12 +13,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
 import static me.jun.blogservice.support.ArticleFixture.*;
 import static me.jun.blogservice.support.CategoryFixture.category;
+import static me.jun.blogservice.support.RedisFixture.ARTICLE_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("deprecation")
 public class ArticleServiceTest {
@@ -38,11 +41,16 @@ public class ArticleServiceTest {
     @Mock
     private CategoryService categoryService;
 
+    @Mock
+    private RedisService redisService;
+
     @BeforeEach
     void setUp() {
         articleService = new ArticleService(
                 articleRepository,
-                categoryService
+                categoryService,
+                redisService,
+                ARTICLE_SIZE
         );
     }
 
@@ -56,8 +64,14 @@ public class ArticleServiceTest {
         given(articleRepository.save(any()))
                 .willReturn(article());
 
+        doNothing()
+                .when(redisService)
+                .deleteArticleList();
+
         assertThat(articleService.createArticle(Mono.just(createArticleRequest())).block())
                 .isEqualTo(expected);
+
+        verify(redisService).deleteArticleList();
     }
 
     @Test
@@ -89,8 +103,15 @@ public class ArticleServiceTest {
         given(articleRepository.findById(any()))
                 .willReturn(Optional.of(updatedArticle()));
 
+        doNothing()
+                .when(redisService)
+                .deleteArticleList();
+
         assertThat(articleService.updateArticle(Mono.just(updateArticleRequest())).block())
                 .isEqualTo(expected);
+
+        verify(redisService)
+                .deleteArticleList();
     }
 
     @Test
@@ -125,11 +146,18 @@ public class ArticleServiceTest {
                 .when(articleRepository)
                 .deleteById(any());
 
+        doNothing()
+                .when(redisService)
+                .deleteArticleList();
+
         articleService.deleteArticle(Mono.just(deleteArticleRequest()))
                 .block();
 
         verify(articleRepository)
                 .deleteById(deleteArticleRequest().getId());
+
+        verify(redisService)
+                .deleteArticleList();
     }
 
     @Test
